@@ -203,7 +203,7 @@ namespace QBan
             {
                 try
                 {
-                    file.WriteLine(String.Format("{0}/{1}/{2}/{3}/{4}/{5}/{6}/{7}/{8}", pair.Value.targetSID.ToString(), pair.Value.targetCharName, pair.Value.targetSteamName, pair.Value.adminSID.ToString(), pair.Value.adminCharName, pair.Value.adminSteamName, pair.Value.reason, pair.Value.duration.ToString(), pair.Value.setTime.ToBinary().ToString()));
+                    file.WriteLine(pair.Value.targetSID.ToString() + "/" + pair.Value.targetCharName + "/" + pair.Value.targetSteamName + "/" + pair.Value.adminSID.ToString() + "/" + pair.Value.adminCharName + "/" + pair.Value.adminSteamName + "/" + pair.Value.reason + "/" + pair.Value.duration.ToString() + "/" + pair.Value.setTime.ToBinary().ToString());
                 }
                 catch (Exception ex)
                 {

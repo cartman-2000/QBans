@@ -99,10 +99,33 @@ namespace QBan
                 foreach (BanDataValues value in list.Value)
                 {
                     int timeLeft = (int)(value.duration - (DateTime.Now - value.setTime).TotalSeconds);
+                    string timeLeftFormat = "";
+
+                    // Format a days, hours minutes and seconds left string for time left
+                    if (timeLeft >= (60 * 60 * 24))
+                    {
+                        timeLeftFormat = ((int)(timeLeft / (60 * 60 * 24))).ToString() + "d ";
+                    }
+                    if (timeLeft >= (60 * 60))
+                    {
+                        timeLeftFormat +=  ((int)((timeLeft / (60 * 60)) %  24)).ToString() + "h ";
+                    }
+                    if (timeLeft >= 60)
+                    {
+                        timeLeftFormat += ((int)((timeLeft / 60) % 60)).ToString() + "m";
+                    }
+                    else if (timeLeft <= 0)
+                    {
+                        timeLeftFormat += "Expired";
+                    }
+                    else
+                    {
+                        timeLeftFormat += timeLeft.ToString() + "s";
+                    }
 
                     // build the strings for the ban info.
                     RocketChatManager.Say(caller, String.Format("{0}. {1} [{2}] ({3}), by {4} [{5}]", lineNumbers, (value.targetCharName.Length == 0 ? "Not set" : value.targetCharName.Truncate(14)), (value.targetSteamName.Length == 0 ? "Not set" : value.targetSteamName.Truncate(14)), value.targetSID.ToString(), value.adminCharName.Truncate(12), value.adminSteamName.Truncate(12)));
-                    RocketChatManager.Say(caller, String.Format("Set: {0}, For: {1}, Left: {2}, Reason: {3}", value.setTime.ToString("M/d/yy HH:mm:ss"),  (timeLeft > Math.Pow(2, 25) ? "perm" : value.duration.ToString()), (timeLeft > Math.Pow(2, 25) ? "perm" : timeLeft.ToString()), value.reason));
+                    RocketChatManager.Say(caller, String.Format("Set: {0}, Till: {1}, Left: {2}, Reason: {3}", value.setTime.ToString("M/d/yy HH:mm"), value.setTime.AddSeconds(value.duration).ToString("M/d/yy"),timeLeftFormat, value.reason));
                     lineNumbers++;
                 }
             }
