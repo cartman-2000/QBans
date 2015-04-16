@@ -73,7 +73,6 @@ namespace QBan
                     SteamBlacklistID Out;
                     if (SteamBlacklist.checkBanned(command.StringToCSteamID(), out Out))
                     {
-                        String[] data = { command, "", "" };
                         banData.targetSID = command.StringToCSteamID();
                         RemoveBan(caller, callerCSteamID, callerCharName, callerSteamName, banData);
                     }

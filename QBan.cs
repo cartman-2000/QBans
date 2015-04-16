@@ -108,12 +108,9 @@ namespace QBan
                 DateTime curTime = DateTime.Now;
                 uint timeLeft = (uint)(checkBan.duration - (curTime - checkBan.setTime).TotalSeconds);
 
-                // Remove ban if it has expired.
+                // Don't try to ban if it has expired.
                 if ((int)timeLeft <= 0)
                 {
-                    dataStore.RemoveQBanData(player.CSteamID);
-                    SteamBlacklist.unban(player.CSteamID);
-                    SteamBlacklist.save();
                     return;
                 }
 

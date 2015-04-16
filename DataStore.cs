@@ -176,7 +176,10 @@ namespace QBan
             {
                 QBanData.Remove(key);
             }
-            SaveToFile();
+            if (expiredList.Count != 0)
+            {
+                SaveToFile();
+            }
         }
 
         // Save to file.
