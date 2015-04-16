@@ -101,7 +101,7 @@ namespace QBan
                     int timeLeft = (int)(value.duration - (DateTime.Now - value.setTime).TotalSeconds);
 
                     // build the strings for the ban info.
-                    RocketChatManager.Say(caller, String.Format("{0}. {1} [{2}] ({3}), by {4} [{5}]", lineNumbers, value.targetCharName.Truncate(14), value.targetSteamName.Truncate(14), value.targetSID.ToString(), value.adminCharName.Truncate(12), value.adminSteamName.Truncate(12)));
+                    RocketChatManager.Say(caller, String.Format("{0}. {1} [{2}] ({3}), by {4} [{5}]", lineNumbers, (value.targetCharName.Length == 0 ? "Not set" : value.targetCharName.Truncate(14)), (value.targetSteamName.Length == 0 ? "Not set" : value.targetSteamName.Truncate(14)), value.targetSID.ToString(), value.adminCharName.Truncate(12), value.adminSteamName.Truncate(12)));
                     RocketChatManager.Say(caller, String.Format("Set: {0}, For: {1}, Left: {2}, Reason: {3}", value.setTime.ToString("M/d/yy HH:mm:ss"),  (timeLeft > Math.Pow(2, 25) ? "perm" : value.duration.ToString()), (timeLeft > Math.Pow(2, 25) ? "perm" : timeLeft.ToString()), value.reason));
                     lineNumbers++;
                 }
