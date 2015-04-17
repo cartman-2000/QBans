@@ -14,8 +14,7 @@ namespace QBan
     {
         public static QBan Instance;
         public DataStore dataStore;
-        private DateTime lastCalledExpire = DateTime.Now;
-        private DateTime lastCalledQueue = DateTime.Now;
+        private DateTime lastCalledTimer = DateTime.Now;
 
         private static Dictionary<CSteamID, PlayersValues> Players = new Dictionary<CSteamID, PlayersValues>();
         private static Dictionary<CSteamID, BanDataValues> BanSync = new Dictionary<CSteamID, BanDataValues>();
@@ -58,37 +57,30 @@ namespace QBan
         {
             if(this.Loaded)
             {
-                CheckExpiredBans();
-                QueueBanSync();
+                if ((DateTime.Now - lastCalledTimer).TotalSeconds > 600)
+                {
+                    QueueBanSync();
+                    dataStore.CheckExpiredBanData();
+                    lastCalledTimer = DateTime.Now;
+                }
             }
         }
 
         // Queue's banned players to the internal bans.
         private void QueueBanSync()
         {
-            if ((DateTime.Now - lastCalledQueue).TotalSeconds > 10)
+            foreach (KeyValuePair<CSteamID, BanDataValues> pair in BanSync)
             {
-                foreach (KeyValuePair<CSteamID, BanDataValues> pair in BanSync)
+                // Don't sync if the time left is negative.
+                if ((int)(pair.Value.duration - (DateTime.Now - pair.Value.setTime).TotalSeconds) > 0)
                 {
                     SteamBlacklist.ban(pair.Key, pair.Value.adminSID, pair.Value.reason, pair.Value.duration);
                     SteamBlacklist.save();
                     RocketChatManager.print(String.Format("Player {0}[{1}]({2}), has been synced to internal bans.", pair.Value.targetCharName, pair.Value.targetSteamName, pair.Value.targetSID));
                 }
-                BanSync.Clear();
-                lastCalledQueue = DateTime.Now;
             }
+            BanSync.Clear();
         }
-
-        // runs through and removes all of the bans that have expired.
-        private void CheckExpiredBans()
-        {
-            if ((DateTime.Now - lastCalledExpire).TotalSeconds > 600)
-            {
-                dataStore.CheckExpiredBanData();
-                lastCalledExpire = DateTime.Now;
-            }
-        }
-
 
         public void Events_OnPlayerConnected(RocketPlayer player)
         {

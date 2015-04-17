@@ -161,11 +161,9 @@ namespace QBan
         public void CheckExpiredBanData()
         {
             List<CSteamID> expiredList = new List<CSteamID>();
-            DateTime curTime = DateTime.Now;
             foreach (KeyValuePair<CSteamID, BanDataValues> pair in QBanData)
             {
-                int timeLeft = (int)(pair.Value.duration - (curTime - pair.Value.setTime).TotalSeconds);
-                if (timeLeft <= 0)
+                if ((int)(pair.Value.duration - (DateTime.Now - pair.Value.setTime).TotalSeconds) <= 0)
                 {
                     expiredList.Add(pair.Key);
                     SteamBlacklist.unban(pair.Key);
