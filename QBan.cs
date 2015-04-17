@@ -71,8 +71,9 @@ namespace QBan
         {
             foreach (KeyValuePair<CSteamID, BanDataValues> pair in BanSync)
             {
-                // Don't sync if the time left is negative.
-                if ((int)(pair.Value.duration - (DateTime.Now - pair.Value.setTime).TotalSeconds) > 0)
+                BanDataValues check = dataStore.GetQBanData(pair.Key);
+                // Don't sync if the time left is negative, and if they aren't still banned.
+                if ((int)(pair.Value.duration - (DateTime.Now - pair.Value.setTime).TotalSeconds) > 0 && check.targetSID != (CSteamID)0)
                 {
                     SteamBlacklist.ban(pair.Key, pair.Value.adminSID, pair.Value.reason, pair.Value.duration);
                     SteamBlacklist.save();
