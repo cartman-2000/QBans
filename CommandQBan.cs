@@ -19,14 +19,15 @@ namespace QBan
 
         public string Help
         {
-            get { return "[Playername|SteamID64]/[reason]/[duration] - bans player, use no duration for permban."; }
+            get { return "[Playername|SteamID64]/[reason]/[duration]/[d/h/m] - bans player, no duration for permban, 4th peram is days, hours, or minutes."; }
         }
 
         public void Execute(RocketPlayer caller, string command)
         {
             SteamPlayer target = null;
             String[] componentsFromString = Parser.getComponentsFromSerial(command, '/');
-            uint banDuration = 1000000000;
+            long banDuration = 1000000000;
+            long maxDuration = banDuration;
             string banReason = "Banned";
 
             if (componentsFromString.Length == 0)
@@ -34,31 +35,64 @@ namespace QBan
                 RocketChatManager.Say(caller, this.Help);
                 return;
             }
-            if (componentsFromString.Length > 3 || componentsFromString[0] == "0")
+            if (componentsFromString.Length > 4 || componentsFromString[0] == "0")
             {
                 RocketChatManager.Say(caller, "Invalid arguments in command.");
                 return;
             }
 
-            // Get uint out of the duration, set the default duration if duration either empty or set to 0.
-            if (componentsFromString.Length == 3)
+            // Set reason for ban, if one has been set.
+            if (componentsFromString.Length >= 2)
             {
-                if (!uint.TryParse(componentsFromString[2], out banDuration) && componentsFromString[2] != "")
+                if (componentsFromString[1] != "")
                 {
-                    RocketChatManager.Say(caller, "Invalid number entered for duration.");
-                    return;
-                }
-                else if (componentsFromString[2] == "" || banDuration == 0 || banDuration >= 1000000000)
-                {
-                    banDuration = 1000000000;
+                    banReason = componentsFromString[1];
                 }
             }
 
-
-            // Set reason for ban, if one has been set.
-            if (componentsFromString.Length > 1)
+            // Get uint out of the duration, set the default duration if duration either empty or set to 0.
+            if (componentsFromString.Length >= 3)
             {
-                banReason = componentsFromString[1];
+                if (!long.TryParse(componentsFromString[2], out banDuration) && componentsFromString[2] != "")
+                {
+                    RocketChatManager.Say(caller, "Error: Invalid number entered for duration.");
+                    return;
+                }
+                else if (banDuration < 0)
+                {
+                    RocketChatManager.Say(caller, "Error: Duration is a negative number.");
+                    return;
+                }
+                else if (componentsFromString[2] == "" || banDuration == 0 || banDuration >= maxDuration)
+                {
+                    banDuration = maxDuration;
+                }
+            }
+
+            // Parse and handle time specifiers.
+            if (componentsFromString.Length == 4)
+            {
+                if (componentsFromString[3] != "d" && componentsFromString[3] != "h" && componentsFromString[3] != "m")
+                {
+                    RocketChatManager.Say(caller, "Improper time specifier entered into command.");
+                    return;
+                }
+                if (componentsFromString[3] == "d" && banDuration * (60 * 60 * 24) < maxDuration)
+                {
+                    banDuration = banDuration * (60 * 60 * 24);
+                }
+                else if (componentsFromString[3] == "h" && banDuration * (60 * 60) < maxDuration)
+                {
+                    banDuration = banDuration * (60 * 60);
+                }
+                else if (componentsFromString[3] == "m" && banDuration * 60 < maxDuration)
+                {
+                    banDuration = banDuration * 60;
+                }
+                else
+                {
+                    banDuration = maxDuration;
+                }
             }
 
             // Set caller info as it is null if it is sent from the console.
@@ -97,7 +131,7 @@ namespace QBan
             data.adminCharName = callerCharName;
             data.adminSteamName = callerSteamName;
             data.reason = banReason;
-            data.duration = banDuration;
+            data.duration = (uint)banDuration;
             data.setTime = DateTime.Now;
 
             // Running player checks.
