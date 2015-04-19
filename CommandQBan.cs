@@ -174,8 +174,9 @@ namespace QBan
                             SteamBlacklist.unban(data.targetSID);
                             SteamBlacklist.save();
 
-                            RocketChatManager.Say(caller, String.Format("Player SteamID64:{0}, has been banned for reason: {1}, for {2} seconds.", data.targetSID, banReason, banDuration));
-                            RocketChatManager.print(String.Format("Admin {0}[{1}]({2}), has banned SteamID64:{3} for {4}, for {5} seconds.", callerCharName, callerSteamName, callerCSteamID, data.targetSID, banReason, banDuration));
+                            RocketChatManager.Say(caller, String.Format("Player SteamID64:{0}, has been banned for {1} seconds.", data.targetSID.ToString(), data.duration.ToString()));
+                            RocketChatManager.Say(caller, String.Format("Reason: {0}", data.reason));
+                            RocketChatManager.print(String.Format("Admin {0}[{1}]({2}), has banned SteamID64:{3} for {4}, for {5} seconds.", callerCharName, callerSteamName, callerCSteamID.ToString(), data.targetSID.ToString(), data.reason, data.duration.ToString()));
                         }
                         else
                         {
@@ -195,7 +196,8 @@ namespace QBan
                 SteamBlacklist.ban(data.targetSID, data.adminSID, data.reason, data.duration);
                 SteamBlacklist.save();
 
-                RocketChatManager.Say(caller, String.Format("Player {0}[{1}]({2}), has been banned for {3}, for {4} seconds.", data.targetCharName, data.targetSteamName, data.targetSID.ToString(), data.reason, data.duration.ToString()));
+                RocketChatManager.Say(caller, String.Format("Player {0}[{1}], has been banned for {2} seconds.", data.targetCharName.Truncate(12), data.targetSteamName.Truncate(12), data.duration.ToString()));
+                RocketChatManager.Say(caller, String.Format("Reason: {0}", data.reason));
                 RocketChatManager.print(String.Format("Admin {0}[{1}]({2}), has banned player {3}[{4}]({5}) for {6}, for {7} seconds.", data.adminCharName, data.adminSteamName, data.adminSID.ToString(), data.targetCharName, data.targetSteamName, data.targetSID.ToString(), data.reason, data.duration.ToString()));
             }
             else
