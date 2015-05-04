@@ -34,7 +34,7 @@ namespace QBan
                 SaveToFile();
             }
 
-            string[] lines = System.IO.File.ReadAllLines(@QBansBansFile);
+            string[] lines = File.ReadAllLines(@QBansBansFile);
             foreach (string value in lines)
             {
                 if (value != "" && !value.StartsWith("##"))
@@ -134,7 +134,15 @@ namespace QBan
         public KeyValuePair<int, List<BanDataValues>> GetQBanDataList(string searchString, int count, int pagination)
         {
             // Grab a list of matches of the searchString out of the QBanData dictionary.
-            var matches = QBanData.Values.Where(contents => contents.targetCharName.ToLower().Contains(searchString.ToLower()) || contents.targetSteamName.ToLower().Contains(searchString.ToLower())).ToList();
+            List<BanDataValues> matches = new List<BanDataValues>();
+            if (searchString == "")
+            {
+                matches = QBanData.Values.ToList();
+            }
+            else
+            {
+                matches = QBanData.Values.Where(contents => contents.targetCharName.ToLower().Contains(searchString.ToLower()) || contents.targetSteamName.ToLower().Contains(searchString.ToLower())).ToList();
+            }
             int matchCount = matches.Count;
             int index;
             int numbeOfRecords;
