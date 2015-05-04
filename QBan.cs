@@ -10,7 +10,7 @@ using System.Collections.Generic;
 
 namespace QBan
 {
-    public class QBan : RocketPlugin
+    public class QBan : RocketPlugin<QBanConfiguration>
     {
         public static QBan Instance;
         public DataStore dataStore;
@@ -59,7 +59,10 @@ namespace QBan
             {
                 if ((DateTime.Now - lastCalledTimer).TotalSeconds > 600)
                 {
-                    QueueBanSync();
+                    if (Configuration.EnableInternalSync)
+                    {
+                        QueueBanSync();
+                    }
                     dataStore.CheckExpiredBanData();
                     lastCalledTimer = DateTime.Now;
                 }
@@ -127,7 +130,8 @@ namespace QBan
 
                 // Have to send the adding to the blacklist to a timed update as it would NRE here, 
                 // SteamBlacklist.ban also calls ban on the player which causes the same NRE as kicking them do here.
-                if (!BanSync.ContainsKey(player.CSteamID))
+                // Only sync to the internal blacklist if syncing has been enabled in the config file.
+                if (!BanSync.ContainsKey(player.CSteamID) && Configuration.EnableInternalSync)
                 {
                     checkBan.duration = timeLeft;
                     BanSync.Add(player.CSteamID, checkBan);

@@ -15,6 +15,7 @@ namespace QBan
         private static string QBansBaseDir = String.Format("Servers/{0}/Rocket/plugins/QBans", Steam.InstanceName);
         private static string QBansBansFile = String.Format("Servers/{0}/Rocket/Plugins/QBans/BansData.txt", Steam.InstanceName);
         private static string QBansBansbackupFile = String.Format("Servers/{0}/Rocket/Plugins/QBans/BansData_bk.txt", Steam.InstanceName);
+        private static string QBansBansExpiredExportFile = String.Format("Servers/{0}/Rocket/Plugins/QBans/BansData_Expired.txt", Steam.InstanceName);
         private static string QBansBansFileHeader = "## Data file for the queued bans, format: target_sid/target_charname/target_steamname/admin_sid/admin_charname/admin_steamname/reason/duration/set_time";
 
         private static Dictionary<CSteamID, BanDataValues> QBanData = new Dictionary<CSteamID, BanDataValues>();
@@ -170,6 +171,17 @@ namespace QBan
                     SteamBlacklist.save();
                 }
             }
+            if (QBan.Instance.Configuration.EnableExpiredExport && expiredList.Count != 0)
+            {
+                StreamWriter file = new StreamWriter(QBansBansExpiredExportFile, true);
+                foreach (CSteamID cSteamID in expiredList)
+                {
+                    BanDataValues data = new BanDataValues();
+                    QBanData.TryGetValue(cSteamID, out data);
+                    WriteLine(file, data);
+                }
+                file.Close();
+            }
             foreach (CSteamID key in expiredList)
             {
                 QBanData.Remove(key);
@@ -199,16 +211,21 @@ namespace QBan
             file.WriteLine(QBansBansFileHeader);
             foreach (KeyValuePair<CSteamID, BanDataValues> pair in QBanData)
             {
-                try
-                {
-                    file.WriteLine(pair.Value.targetSID.ToString() + "/" + pair.Value.targetCharName + "/" + pair.Value.targetSteamName + "/" + pair.Value.adminSID.ToString() + "/" + pair.Value.adminCharName + "/" + pair.Value.adminSteamName + "/" + pair.Value.reason + "/" + pair.Value.duration.ToString() + "/" + pair.Value.setTime.ToBinary().ToString());
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogException(ex);
-                }
+                WriteLine(file, pair.Value);
             }
             file.Close();
+        }
+
+        private static void WriteLine(StreamWriter file, BanDataValues data)
+        {
+            try
+            {
+                file.WriteLine(data.targetSID.ToString() + "/" + data.targetCharName + "/" + data.targetSteamName + "/" + data.adminSID.ToString() + "/" + data.adminCharName + "/" + data.adminSteamName + "/" + data.reason + "/" + data.duration.ToString() + "/" + data.setTime.ToBinary().ToString());
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
         }
     }
 }

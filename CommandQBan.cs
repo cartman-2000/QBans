@@ -193,8 +193,11 @@ namespace QBan
         {
             if (QBan.Instance.dataStore.SetQBanData(data.targetSID, data))
             {
-                SteamBlacklist.ban(data.targetSID, data.adminSID, data.reason, data.duration);
-                SteamBlacklist.save();
+                if (QBan.Instance.Configuration.EnableInternalSync)
+                {
+                    SteamBlacklist.ban(data.targetSID, data.adminSID, data.reason, data.duration);
+                    SteamBlacklist.save();
+                }
 
                 RocketChatManager.Say(caller, String.Format("Player {0}[{1}], has been banned for {2} seconds.", data.targetCharName.Truncate(12), data.targetSteamName.Truncate(12), data.duration.ToString()));
                 RocketChatManager.Say(caller, String.Format("Reason: {0}", data.reason));
