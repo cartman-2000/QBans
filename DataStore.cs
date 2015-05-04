@@ -86,7 +86,7 @@ namespace QBan
             }
             catch
             {
-                RocketChatManager.print("Error, Unable to set ban data, wrong number of array elements.");
+                Logger.LogWarning("Error, Unable to set ban data, wrong number of array elements.");
                 return false;
             }
         }

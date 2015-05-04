@@ -125,7 +125,7 @@ namespace QBan
 
                     // build the strings for the ban info.
                     RocketChatManager.Say(caller, String.Format("{0}. {1} [{2}] ({3}), by {4} [{5}]", lineNumbers, (value.targetCharName.Length == 0 ? "Not set" : value.targetCharName.Truncate(14)), (value.targetSteamName.Length == 0 ? "Not set" : value.targetSteamName.Truncate(14)), value.targetSID.ToString(), value.adminCharName.Truncate(12), value.adminSteamName.Truncate(12)));
-                    RocketChatManager.Say(caller, String.Format("Set: {0}, Till: {1}, Left: {2}, Reason: {3}", value.setTime.ToString("M/d/yy HH:mm"), value.setTime.AddSeconds(value.duration).ToString("M/d/yy"),timeLeftFormat, value.reason));
+                    RocketChatManager.Say(caller, String.Format("Set: {0:M/d/yy HH:mm}, Till: {1:M/d/yy}, Left: {2}, Reason: {3}", value.setTime, value.setTime.AddSeconds(value.duration), timeLeftFormat, value.reason));
                     lineNumbers++;
                 }
             }

@@ -1,4 +1,5 @@
 ﻿using System;
+using Rocket.Logging;
 using Rocket.RocketAPI;
 using SDG;
 
@@ -61,11 +62,11 @@ namespace QBan
                 if (caller != null)
                 {
                     RocketChatManager.Say(caller, String.Format("You've kicked player {0}[{1}]({2}).", target.CharacterName, target.SteamName, target.CSteamID));
-                    RocketChatManager.print(String.Format("Player {0}[{1}]({2}) has been kicked by admin {3}[{4}]({5})", target.CharacterName, target.SteamName, target.CSteamID, caller.CharacterName, caller.SteamName, caller.CSteamID));
+                    Logger.Log(String.Format("Player {0}[{1}]({2}) has been kicked by admin {3}[{4}]({5})", target.CharacterName, target.SteamName, target.CSteamID, caller.CharacterName, caller.SteamName, caller.CSteamID));
                 }
                 else
                 {
-                    RocketChatManager.print(String.Format("Player {0}[{1}]({2}), has been kicked by Console.", target.CharacterName, target.SteamName, target.CSteamID));
+                    Logger.Log(String.Format("Player {0}[{1}]({2}), has been kicked by Console.", target.CharacterName, target.SteamName, target.CSteamID));
                 }
             }
             catch

@@ -1,5 +1,6 @@
 ﻿// Plugin written by cartman-2000. https://github.com/cartman-2000/QBans
 
+using Rocket.Logging;
 using Rocket.RocketAPI;
 using Rocket.RocketAPI.Events;
 using SDG;
@@ -80,7 +81,7 @@ namespace QBan
                 {
                     SteamBlacklist.ban(pair.Key, pair.Value.adminSID, pair.Value.reason, pair.Value.duration);
                     SteamBlacklist.save();
-                    RocketChatManager.print(String.Format("Player {0}[{1}]({2}), has been synced to internal bans.", pair.Value.targetCharName, pair.Value.targetSteamName, pair.Value.targetSID));
+                    Logger.Log(String.Format("Player {0}[{1}]({2}), has been synced to internal bans.", pair.Value.targetCharName, pair.Value.targetSteamName, pair.Value.targetSID));
                 }
             }
             BanSync.Clear();

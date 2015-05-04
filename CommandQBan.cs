@@ -1,4 +1,5 @@
-﻿using Rocket.RocketAPI;
+﻿using Rocket.Logging;
+using Rocket.RocketAPI;
 using SDG;
 using Steamworks;
 using System;
@@ -19,7 +20,7 @@ namespace QBan
 
         public string Help
         {
-            get { return "[Playername|SteamID64]/[reason]/[duration]/[d/h/m] - bans player, no duration for permban, 4th peram is days, hours, or minutes."; }
+            get { return "[ Playername|SteamID64 ]/[ reason ]/[ duration ]/[ d/h/m ] - bans player, no duration for permban, 4th peram is days, hours, or minutes."; }
         }
 
         public void Execute(RocketPlayer caller, string command)
@@ -69,12 +70,12 @@ namespace QBan
                 }
             }
 
-            // Parse and handle time specifiers.
+            // Parse and handle time modifier.
             if (componentsFromString.Length == 4)
             {
                 if (componentsFromString[3] != "d" && componentsFromString[3] != "h" && componentsFromString[3] != "m")
                 {
-                    RocketChatManager.Say(caller, "Improper time specifier entered into command.");
+                    RocketChatManager.Say(caller, "Improper time modifier entered into command.");
                     return;
                 }
                 if (componentsFromString[3] == "d" && banDuration * (60 * 60 * 24) < maxDuration)
@@ -176,7 +177,7 @@ namespace QBan
 
                             RocketChatManager.Say(caller, String.Format("Player SteamID64:{0}, has been banned for {1} seconds.", data.targetSID.ToString(), data.duration.ToString()));
                             RocketChatManager.Say(caller, String.Format("Reason: {0}", data.reason));
-                            RocketChatManager.print(String.Format("Admin {0}[{1}]({2}), has banned SteamID64:{3} for {4}, for {5} seconds.", callerCharName, callerSteamName, callerCSteamID.ToString(), data.targetSID.ToString(), data.reason, data.duration.ToString()));
+                            Logger.Log(String.Format("Admin {0}[{1}]({2}), has banned SteamID64:{3} for {4}, for {5} seconds.", callerCharName, callerSteamName, callerCSteamID.ToString(), data.targetSID.ToString(), data.reason, data.duration.ToString()));
                         }
                         else
                         {
@@ -201,7 +202,7 @@ namespace QBan
 
                 RocketChatManager.Say(caller, String.Format("Player {0}[{1}], has been banned for {2} seconds.", data.targetCharName.Truncate(12), data.targetSteamName.Truncate(12), data.duration.ToString()));
                 RocketChatManager.Say(caller, String.Format("Reason: {0}", data.reason));
-                RocketChatManager.print(String.Format("Admin {0}[{1}]({2}), has banned player {3}[{4}]({5}) for {6}, for {7} seconds.", data.adminCharName, data.adminSteamName, data.adminSID.ToString(), data.targetCharName, data.targetSteamName, data.targetSID.ToString(), data.reason, data.duration.ToString()));
+                Logger.Log(String.Format("Admin {0}[{1}]({2}), has banned player {3}[{4}]({5}) for {6}, for {7} seconds.", data.adminCharName, data.adminSteamName, data.adminSID.ToString(), data.targetCharName, data.targetSteamName, data.targetSID.ToString(), data.reason, data.duration.ToString()));
             }
             else
             {

@@ -1,4 +1,5 @@
-﻿using Rocket.RocketAPI;
+﻿using Rocket.Logging;
+using Rocket.RocketAPI;
 using SDG;
 using Steamworks;
 using System;
@@ -107,7 +108,7 @@ namespace QBan
             SteamBlacklist.save();
 
             RocketChatManager.Say(caller, String.Format("You have Unbanned player {0}[{1}]({2}).", banData.targetCharName, banData.targetSteamName, banData.targetSID.ToString()));
-            RocketChatManager.print(String.Format("Admin {0}[{1}]({2}), has banned player {3}[{4}]({5}).", callerCharName, callerSteamName, callerCSteamID, banData.targetCharName, banData.targetSteamName, banData.targetSID));
+            Logger.Log(String.Format("Admin {0}[{1}]({2}), has banned player {3}[{4}]({5}).", callerCharName, callerSteamName, callerCSteamID, banData.targetCharName, banData.targetSteamName, banData.targetSID));
         }
     }
 }
