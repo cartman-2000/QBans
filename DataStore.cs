@@ -172,7 +172,7 @@ namespace QBan
             List<CSteamID> expiredList = new List<CSteamID>();
             foreach (KeyValuePair<CSteamID, BanDataValues> pair in QBanData)
             {
-                if ((int)(pair.Value.duration - (DateTime.Now - pair.Value.setTime).TotalSeconds) <= 0)
+                if ((pair.Value.duration - (DateTime.Now - pair.Value.setTime).TotalSeconds) <= 0)
                 {
                     expiredList.Add(pair.Key);
                     SteamBlacklist.unban(pair.Key);
@@ -184,7 +184,7 @@ namespace QBan
                 StreamWriter file = new StreamWriter(QBansBansExpiredExportFile, true);
                 foreach (CSteamID cSteamID in expiredList)
                 {
-                    BanDataValues data = new BanDataValues();
+                    BanDataValues data;
                     QBanData.TryGetValue(cSteamID, out data);
                     WriteLine(file, data);
                 }

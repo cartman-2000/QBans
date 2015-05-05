@@ -76,10 +76,11 @@ namespace QBan
             foreach (KeyValuePair<CSteamID, BanDataValues> pair in BanSync)
             {
                 BanDataValues check = dataStore.GetQBanData(pair.Key);
+                int timeLeft = (int)(pair.Value.duration - (DateTime.Now - pair.Value.setTime).TotalSeconds);
                 // Don't sync if the time left is negative, and if they aren't still banned.
-                if ((int)(pair.Value.duration - (DateTime.Now - pair.Value.setTime).TotalSeconds) > 0 && check.targetSID != (CSteamID)0)
+                if (timeLeft > 0 && check.targetSID != (CSteamID)0)
                 {
-                    SteamBlacklist.ban(pair.Key, pair.Value.adminSID, pair.Value.reason, pair.Value.duration);
+                    SteamBlacklist.ban(pair.Key, pair.Value.adminSID, pair.Value.reason, (uint)timeLeft);
                     SteamBlacklist.save();
                     Logger.Log(String.Format("Player {0}[{1}]({2}), has been synced to internal bans.", pair.Value.targetCharName, pair.Value.targetSteamName, pair.Value.targetSID));
                 }
@@ -89,7 +90,7 @@ namespace QBan
 
         public void Events_OnPlayerConnected(RocketPlayer player)
         {
-            if(!Players.ContainsKey(player.CSteamID))
+            if (!Players.ContainsKey(player.CSteamID))
             {
                 PlayersValues playerData = new PlayersValues();
                 playerData.playerSID = player.CSteamID;
@@ -97,16 +98,24 @@ namespace QBan
                 playerData.playerSteamName = player.SteamName;
                 Players.Add(player.CSteamID, playerData);
             }
+            else
+            {
+                // update the stored player name if it doesn't match what they are currently using.
+                PlayersValues playerData;
+                Players.TryGetValue(player.CSteamID, out playerData);
+                if (playerData.playerCharName != player.CharacterName || playerData.playerSteamName != player.SteamName)
+                {
+                    playerData.playerCharName = player.CharacterName;
+                    playerData.playerSteamName = player.SteamName;
+                }
+            }
 
             //check to see if the player needs to be banned.
             BanDataValues checkBan = dataStore.GetQBanData(player.CSteamID);
             if (checkBan.targetSID != (CSteamID)0)
             {
-                DateTime curTime = DateTime.Now;
-                uint timeLeft = (uint)(checkBan.duration - (curTime - checkBan.setTime).TotalSeconds);
-
                 // Don't try to ban if it has expired.
-                if ((int)timeLeft <= 0)
+                if (checkBan.duration - (DateTime.Now - checkBan.setTime).TotalSeconds <= 0)
                 {
                     return;
                 }
@@ -134,7 +143,6 @@ namespace QBan
                 // Only sync to the internal blacklist if syncing has been enabled in the config file.
                 if (!BanSync.ContainsKey(player.CSteamID) && Configuration.EnableInternalSync)
                 {
-                    checkBan.duration = timeLeft;
                     BanSync.Add(player.CSteamID, checkBan);
                 }
             }
