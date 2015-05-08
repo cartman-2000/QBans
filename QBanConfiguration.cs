@@ -2,12 +2,12 @@
 
 namespace QBan
 {
-    public class QBanConfiguration : RocketConfiguration
+    public class QBanConfiguration : IRocketConfiguration
     {
         public bool EnableInternalSync;
         public bool EnableExpiredExport;
 
-        public RocketConfiguration DefaultConfiguration
+        public IRocketConfiguration DefaultConfiguration
         {
             get
             {
