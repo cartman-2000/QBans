@@ -20,7 +20,7 @@ namespace QBan
 
         public string Help
         {
-            get { return "[Playername|SteamID64] - Unbans a player on the server."; }
+            get { return "[\"Playername\"|SteamID64] - Unbans a player on the server."; }
         }
 
         public void Execute(RocketPlayer caller, params string[] command)
@@ -28,6 +28,20 @@ namespace QBan
             if (command.Length == 0)
             {
                 RocketChatManager.Say(caller, this.Help);
+                return;
+            }
+
+            if (command.Length == 1)
+            {
+                if (command[0].Contains("/"))
+                {
+                    command = Parser.getComponentsFromSerial(command[0], '/');
+                }
+            }
+
+            if (command.Length > 1)
+            {
+                RocketChatManager.Say(caller, "Invalid arguments in command.");
                 return;
             }
 

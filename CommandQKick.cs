@@ -9,7 +9,7 @@ namespace QBan
     {
         public string Help
         {
-            get { return "[playername|SteamID64]/[Reason] - Kicks a player."; }
+            get { return "[\"playername\"|SteamID64] [\"Reason\"] - Kicks a player."; }
         }
 
         public string Name
@@ -30,9 +30,18 @@ namespace QBan
                 RocketChatManager.Say(caller, this.Help);
                 return;
             }
+
+            if (command.Length == 1)
+            {
+                if (command[0].Contains("/"))
+                {
+                    command = Parser.getComponentsFromSerial(command[0], '/');
+                }
+            }
+
             if(command.Length > 2)
             {
-                RocketChatManager.Say(caller, "Invalid arguments.");
+                RocketChatManager.Say(caller, "Invalid arguments in command.");
                 return;
             }
 

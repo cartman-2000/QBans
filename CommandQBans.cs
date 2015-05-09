@@ -18,14 +18,23 @@ namespace QBan
 
         public string Help
         {
-            get { return "[playername]/[page] - Shows a list of bans on the server, use playername to narrow the list."; }
+            get { return "[\"playername\"] [page] - Shows a list of bans on the server, use playername to narrow the list."; }
         }
 
         public void Execute(RocketPlayer caller, params string[] command)
         {
+            if (command.Length == 1)
+            {
+                if (command[0].Contains("/"))
+                {
+                    command = Parser.getComponentsFromSerial(command[0], '/');
+                }
+            }
+
             if (command.Length > 2)
             {
-                RocketChatManager.Say(caller, "Too many areguments.");
+                RocketChatManager.Say(caller, "Invalid areguments in command.");
+                return;
             }
 
             // Don't support SteamID64 number in this command.

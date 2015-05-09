@@ -20,7 +20,7 @@ namespace QBan
 
         public string Help
         {
-            get { return "[ Playername|SteamID64 ]/[ reason ]/[ duration ]/[ d/h/m ] - bans player, no duration for permban, 4th peram is days, hours, or minutes."; }
+            get { return "[\"Playername\"|SteamID64] [\"reason\"] [duration] [d|h|m] - bans player, no duration for permban, 4th peram is days, hours, or minutes."; }
         }
 
         public void Execute(RocketPlayer caller, params string[] command)
@@ -35,6 +35,15 @@ namespace QBan
                 RocketChatManager.Say(caller, this.Help);
                 return;
             }
+
+            if (command.Length == 1)
+            {
+                if (command[0].Contains("/"))
+                {
+                    command = Parser.getComponentsFromSerial(command[0], '/');
+                }
+            }
+
             if (command.Length > 4 || command[0] == "0")
             {
                 RocketChatManager.Say(caller, "Invalid arguments in command.");
