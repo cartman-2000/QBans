@@ -22,17 +22,15 @@ namespace QBan
             get { return true; }
         }
 
-        public void Execute(RocketPlayer caller, string command)
+        public void Execute(RocketPlayer caller, params string[] command)
         {
             RocketPlayer target = null;
-            String[] componentsFromString = Parser.getComponentsFromSerial(command, '/');
-
-            if(componentsFromString.Length == 0)
+            if(command.Length == 0)
             {
                 RocketChatManager.Say(caller, this.Help);
                 return;
             }
-            if(componentsFromString.Length > 2)
+            if(command.Length > 2)
             {
                 RocketChatManager.Say(caller, "Invalid arguments.");
                 return;
@@ -41,19 +39,19 @@ namespace QBan
             // Get the player info on the server.
             try
             {
-                target = RocketPlayer.FromCSteamID(componentsFromString[0].StringToCSteamID());
+                target = RocketPlayer.FromCSteamID(command[0].StringToCSteamID());
             }
             catch
             {
-                target = RocketPlayer.FromName(componentsFromString[0]);
+                target = RocketPlayer.FromName(command[0]);
             }
 
             // see if we can kick them.
             try
             {
-                if (componentsFromString.Length == 2)
+                if (command.Length == 2)
                 {
-                    target.Kick(componentsFromString[1]);
+                    target.Kick(command[1]);
                 }
                 else
                 {
@@ -71,7 +69,7 @@ namespace QBan
             }
             catch
             {
-                RocketChatManager.Say(caller, String.Format("Player {0} not found.", componentsFromString[0]));
+                RocketChatManager.Say(caller, String.Format("Player {0} not found.", command[0]));
             }
         }
     }

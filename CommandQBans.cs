@@ -21,10 +21,9 @@ namespace QBan
             get { return "[playername]/[page] - Shows a list of bans on the server, use playername to narrow the list."; }
         }
 
-        public void Execute(RocketPlayer caller, string command)
+        public void Execute(RocketPlayer caller, params string[] command)
         {
-            String[] componentsFromString = Parser.getComponentsFromSerial(command, '/');
-            if (componentsFromString.Length > 2)
+            if (command.Length > 2)
             {
                 RocketChatManager.Say(caller, "Too many areguments.");
             }
@@ -32,10 +31,10 @@ namespace QBan
             // Don't support SteamID64 number in this command.
             try
             {
-                if (componentsFromString.Length > 0)
+                if (command.Length > 0)
                 {
                     // Check for id number in the command.
-                    componentsFromString[0].StringToCSteamID();
+                    command[0].StringToCSteamID();
                     RocketChatManager.Say(caller, "SteamID64 Number's aren't supported in this command.");
                     return;
                 }
@@ -56,35 +55,35 @@ namespace QBan
                 recordcount = 4;
             }
 
-            if (componentsFromString.Length == 2)
+            if (command.Length == 2)
             {
                 int Out;
-                if (int.TryParse(componentsFromString[1], out Out))
+                if (int.TryParse(command[1], out Out))
                 {
                     pagination = Out;
                     if (pagination < 0)
                     {
-                        RocketChatManager.Say("Error: page number is negative.");
+                        RocketChatManager.Say(caller, "Error: page number is negative.");
                         return;
                     }
                 }
                 else
                 {
-                    RocketChatManager.Say("Error: page number is not a number.");
+                    RocketChatManager.Say(caller, "Error: page number is not a number.");
                     return;
                 }
 
             }
 
             string target = "";
-            if(componentsFromString.Length > 0)
+            if(command.Length > 0)
             {
-                if (componentsFromString[0] == "help")
+                if (command[0] == "help")
                 {
                     RocketChatManager.Say(caller, this.Help);
                     return;
                 }
-                target = componentsFromString[0];
+                target = command[0];
             }
 
             KeyValuePair<int, List<BanDataValues>> list = QBan.Instance.dataStore.GetQBanDataList(target, recordcount, pagination);

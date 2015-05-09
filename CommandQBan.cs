@@ -23,38 +23,37 @@ namespace QBan
             get { return "[ Playername|SteamID64 ]/[ reason ]/[ duration ]/[ d/h/m ] - bans player, no duration for permban, 4th peram is days, hours, or minutes."; }
         }
 
-        public void Execute(RocketPlayer caller, string command)
+        public void Execute(RocketPlayer caller, params string[] command)
         {
             SteamPlayer target = null;
-            String[] componentsFromString = Parser.getComponentsFromSerial(command, '/');
             long banDuration = 1000000000;
             long maxDuration = banDuration;
             string banReason = "Banned";
 
-            if (componentsFromString.Length == 0)
+            if (command.Length == 0)
             {
                 RocketChatManager.Say(caller, this.Help);
                 return;
             }
-            if (componentsFromString.Length > 4 || componentsFromString[0] == "0")
+            if (command.Length > 4 || command[0] == "0")
             {
                 RocketChatManager.Say(caller, "Invalid arguments in command.");
                 return;
             }
 
             // Set reason for ban, if one has been set.
-            if (componentsFromString.Length >= 2)
+            if (command.Length >= 2)
             {
-                if (componentsFromString[1] != "")
+                if (command[1] != "")
                 {
-                    banReason = componentsFromString[1];
+                    banReason = command[1];
                 }
             }
 
             // Get uint out of the duration, set the default duration if duration either empty or set to 0.
-            if (componentsFromString.Length >= 3)
+            if (command.Length >= 3)
             {
-                if (!long.TryParse(componentsFromString[2], out banDuration) && componentsFromString[2] != "")
+                if (!long.TryParse(command[2], out banDuration) && command[2] != "")
                 {
                     RocketChatManager.Say(caller, "Error: Invalid number entered for duration.");
                     return;
@@ -64,29 +63,29 @@ namespace QBan
                     RocketChatManager.Say(caller, "Error: Duration is a negative number.");
                     return;
                 }
-                else if (componentsFromString[2] == "" || banDuration == 0 || banDuration >= maxDuration)
+                else if (command[2] == "" || banDuration == 0 || banDuration >= maxDuration)
                 {
                     banDuration = maxDuration;
                 }
             }
 
             // Parse and handle time modifier.
-            if (componentsFromString.Length == 4)
+            if (command.Length == 4)
             {
-                if (componentsFromString[3] != "d" && componentsFromString[3] != "h" && componentsFromString[3] != "m")
+                if (command[3] != "d" && command[3] != "h" && command[3] != "m")
                 {
                     RocketChatManager.Say(caller, "Improper time modifier entered into command.");
                     return;
                 }
-                if (componentsFromString[3] == "d" && banDuration * (60 * 60 * 24) < maxDuration)
+                if (command[3] == "d" && banDuration * (60 * 60 * 24) < maxDuration)
                 {
                     banDuration = banDuration * (60 * 60 * 24);
                 }
-                else if (componentsFromString[3] == "h" && banDuration * (60 * 60) < maxDuration)
+                else if (command[3] == "h" && banDuration * (60 * 60) < maxDuration)
                 {
                     banDuration = banDuration * (60 * 60);
                 }
-                else if (componentsFromString[3] == "m" && banDuration * 60 < maxDuration)
+                else if (command[3] == "m" && banDuration * 60 < maxDuration)
                 {
                     banDuration = banDuration * 60;
                 }
@@ -118,12 +117,12 @@ namespace QBan
             PlayersValues getPlayer;
             try
             {
-                getPlayer = QBan.GetPlayer(componentsFromString[0].StringToCSteamID());
+                getPlayer = QBan.GetPlayer(command[0].StringToCSteamID());
                 isCSteamID = true;
             }
             catch
             {
-                getPlayer = QBan.GetPlayer(componentsFromString[0]);
+                getPlayer = QBan.GetPlayer(command[0]);
                 isCSteamID = false;
             }
 
@@ -136,7 +135,7 @@ namespace QBan
             data.setTime = DateTime.Now;
 
             // Running player checks.
-            if (PlayerTool.tryGetSteamPlayer(componentsFromString[0], out target))
+            if (PlayerTool.tryGetSteamPlayer(command[0], out target))
             {
                 // player is online, handle them normally.
                 data.targetSID = target.SteamPlayerID.CSteamID;
@@ -161,12 +160,12 @@ namespace QBan
                     // Can't ban a player if the SteamID64 number can't be found. Explicitly add the ban if what was entered was a SteamID64 number.
                     if (!isCSteamID)
                     {
-                        RocketChatManager.Say(caller, String.Format("Can't find a player by the name of {0}, that has played on the server before.", componentsFromString[0]));
+                        RocketChatManager.Say(caller, String.Format("Can't find a player by the name of {0}, that has played on the server before.", command[0]));
                         return;
                     }
                     else
                     {
-                        data.targetSID = componentsFromString[0].StringToCSteamID();
+                        data.targetSID = command[0].StringToCSteamID();
                         data.targetCharName = "";
                         data.targetSteamName = "";
                         if (QBan.Instance.dataStore.SetQBanData(data.targetSID, data))

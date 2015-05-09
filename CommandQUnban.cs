@@ -23,9 +23,9 @@ namespace QBan
             get { return "[Playername|SteamID64] - Unbans a player on the server."; }
         }
 
-        public void Execute(RocketPlayer caller, string command)
+        public void Execute(RocketPlayer caller, params string[] command)
         {
-            if (command == "")
+            if (command.Length == 0)
             {
                 RocketChatManager.Say(caller, this.Help);
                 return;
@@ -51,12 +51,12 @@ namespace QBan
             BanDataValues banData;
             try
             {
-                banData = QBan.Instance.dataStore.GetQBanData(command.StringToCSteamID());
+                banData = QBan.Instance.dataStore.GetQBanData(command[0].StringToCSteamID());
                 isCSteamID = true;
             }
             catch
             {
-                banData = QBan.Instance.dataStore.GetQBanData(command);
+                banData = QBan.Instance.dataStore.GetQBanData(command[0]);
                 isCSteamID = false;
             }
 
@@ -72,9 +72,9 @@ namespace QBan
                 {
                     // Check to see if the ban exists in the in-built bans, and remove if it is, otherwise fail.
                     SteamBlacklistID Out;
-                    if (SteamBlacklist.checkBanned(command.StringToCSteamID(), out Out))
+                    if (SteamBlacklist.checkBanned(command[0].StringToCSteamID(), out Out))
                     {
-                        banData.targetSID = command.StringToCSteamID();
+                        banData.targetSID = command[0].StringToCSteamID();
                         RemoveBan(caller, callerCSteamID, callerCharName, callerSteamName, banData);
                     }
                     else
