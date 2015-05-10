@@ -55,7 +55,7 @@ namespace QBan
             {
                 if (command[1] != "")
                 {
-                    banReason = command[1];
+                    banReason = command[1].Replace("><", "");
                 }
             }
 
@@ -117,8 +117,8 @@ namespace QBan
             else
             {
                 callerCSteamID = caller.CSteamID;
-                callerCharName = caller.CharacterName;
-                callerSteamName = caller.SteamName;
+                callerCharName = caller.CharacterName.Replace("><", "");
+                callerSteamName = caller.SteamName.Replace("><", "");
             }
 
             // Is what is entered in the command a SteamID64 number. Also set the variable to check to see if the player has played on the server since it's start.
@@ -148,8 +148,8 @@ namespace QBan
             {
                 // player is online, handle them normally.
                 data.targetSID = target.SteamPlayerID.CSteamID;
-                data.targetCharName = target.SteamPlayerID.CharacterName;
-                data.targetSteamName = target.SteamPlayerID.SteamName;
+                data.targetCharName = target.SteamPlayerID.CharacterName.Replace("><", "");
+                data.targetSteamName = target.SteamPlayerID.SteamName.Replace("><", "");
                 SetBan(caller, data);
             }
             else
@@ -159,8 +159,8 @@ namespace QBan
                 if (getPlayer.playerSID != (CSteamID)0)
                 {
                     data.targetSID = getPlayer.playerSID;
-                    data.targetCharName = getPlayer.playerCharName;
-                    data.targetSteamName = getPlayer.playerSteamName;
+                    data.targetCharName = getPlayer.playerCharName.Replace("><", "");
+                    data.targetSteamName = getPlayer.playerSteamName.Replace("><", "");
                     SetBan(caller, data);
                 }
                 // Didn't get a hit on the player info, They haven't played on the server since last start. Continue if a SteamID64 number was entered in the command.
