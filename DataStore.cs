@@ -16,7 +16,7 @@ namespace QBan
         private static string QBansBansFile = String.Format("Servers/{0}/Rocket/Plugins/QBans/BansData.txt", Steam.InstanceName);
         private static string QBansBansbackupFile = String.Format("Servers/{0}/Rocket/Plugins/QBans/BansData_bk.txt", Steam.InstanceName);
         private static string QBansBansExpiredExportFile = String.Format("Servers/{0}/Rocket/Plugins/QBans/BansData_Expired.txt", Steam.InstanceName);
-        private static string QBansBansFileHeader = "## Data file for the queued bans, format: target_sid/target_charname/target_steamname/admin_sid/admin_charname/admin_steamname/reason/duration/set_time";
+        private static string QBansBansFileHeader = "## Data file for the queued bans, format: target_sid><target_charname><target_steamname><admin_sid><admin_charname><admin_steamname><reason><duration><set_time";
 
         private static Dictionary<CSteamID, BanDataValues> QBanData = new Dictionary<CSteamID, BanDataValues>();
 
@@ -39,7 +39,17 @@ namespace QBan
             {
                 if (value != "" && !value.StartsWith("##"))
                 {
-                    string[] componentsFromSerial = Parser.getComponentsFromSerial(value, '/');
+                    //use new style string splitting delimiter or old one based on what it matches.
+                    String[] componentsFromSerial;
+                    if (value.Contains("><"))
+                    {
+                        componentsFromSerial = value.Split(new String[] { "><" }, StringSplitOptions.None);
+                    }
+                    else
+                    {
+                        componentsFromSerial = value.Split(new char[] { '/' }, StringSplitOptions.None);
+                    }
+
                     if (componentsFromSerial.Length == 9)
                     {
                         uint banDuration;
@@ -228,7 +238,7 @@ namespace QBan
         {
             try
             {
-                file.WriteLine(data.targetSID.ToString() + "/" + data.targetCharName + "/" + data.targetSteamName + "/" + data.adminSID.ToString() + "/" + data.adminCharName + "/" + data.adminSteamName + "/" + data.reason + "/" + data.duration.ToString() + "/" + data.setTime.ToBinary().ToString());
+                file.WriteLine(data.targetSID.ToString() + "><" + data.targetCharName + "><" + data.targetSteamName + "><" + data.adminSID.ToString() + "><" + data.adminCharName + "><" + data.adminSteamName + "><" + data.reason + "><" + data.duration.ToString() + "><" + data.setTime.ToBinary().ToString());
             }
             catch (Exception ex)
             {
