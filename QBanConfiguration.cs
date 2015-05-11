@@ -6,6 +6,7 @@ namespace QBan
     {
         public bool EnableInternalSync;
         public bool EnableExpiredExport;
+        public bool ReasonManditory;
 
         public IRocketConfiguration DefaultConfiguration
         {
@@ -14,7 +15,8 @@ namespace QBan
                 return new QBanConfiguration()
                 {
                     EnableInternalSync = true,
-                    EnableExpiredExport = true
+                    EnableExpiredExport = true,
+                    ReasonManditory = true
                 };
             }
         }

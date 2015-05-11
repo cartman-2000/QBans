@@ -44,6 +44,20 @@ namespace QBan
                 }
             }
 
+            if (command.Length >= 1)
+            {
+                if (command.Length == 1 && QBan.Instance.Configuration.ReasonManditory)
+                {
+                    RocketChatManager.Say(caller, "Error: Reason is manditory on ban command.");
+                    return;
+                }
+                else if (command[1] == "" && QBan.Instance.Configuration.ReasonManditory)
+                {
+                    RocketChatManager.Say(caller, "Error: Reason is manditory on ban command.");
+                    return;
+                }
+            }
+
             if (command.Length > 4 || command[0] == "0")
             {
                 RocketChatManager.Say(caller, "Invalid arguments in command.");

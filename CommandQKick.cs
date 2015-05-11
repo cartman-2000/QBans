@@ -39,6 +39,20 @@ namespace QBan
                 }
             }
 
+            if (command.Length >= 1)
+            {
+                if (command.Length == 1 && QBan.Instance.Configuration.ReasonManditory)
+                {
+                    RocketChatManager.Say(caller, "Error: Reason is manditory on kick command.");
+                    return;
+                }
+                else if (command[1] == "" && QBan.Instance.Configuration.ReasonManditory)
+                {
+                    RocketChatManager.Say(caller, "Error: Reason is manditory on kick command.");
+                    return;
+                }
+            }
+
             if(command.Length > 2)
             {
                 RocketChatManager.Say(caller, "Invalid arguments in command.");
@@ -58,22 +72,20 @@ namespace QBan
             // see if we can kick them.
             try
             {
+                string reason = "You've been kicked.";
                 if (command.Length == 2)
                 {
-                    target.Kick(command[1]);
+                    reason = command[1];
                 }
-                else
-                {
-                    target.Kick("You've been kicked.");
-                }
+                target.Kick(reason);
                 if (caller != null)
                 {
                     RocketChatManager.Say(caller, String.Format("You've kicked player {0}[{1}]({2}).", target.CharacterName, target.SteamName, target.CSteamID));
-                    Logger.Log(String.Format("Player {0}[{1}]({2}) has been kicked by admin {3}[{4}]({5})", target.CharacterName, target.SteamName, target.CSteamID, caller.CharacterName, caller.SteamName, caller.CSteamID));
+                    Logger.Log(String.Format("Player {0}[{1}]({2}) has been kicked by admin {3}[{4}]({5}). Reason: {6}", target.CharacterName, target.SteamName, target.CSteamID, caller.CharacterName, caller.SteamName, caller.CSteamID, reason));
                 }
                 else
                 {
-                    Logger.Log(String.Format("Player {0}[{1}]({2}), has been kicked by Console.", target.CharacterName, target.SteamName, target.CSteamID));
+                    Logger.Log(String.Format("Player {0}[{1}]({2}), has been kicked by Console. Reason: {3}", target.CharacterName, target.SteamName, target.CSteamID, reason));
                 }
             }
             catch
