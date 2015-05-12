@@ -145,7 +145,7 @@ namespace QBan
         {
             // Grab a list of matches of the searchString out of the QBanData dictionary.
             List<BanDataValues> matches = new List<BanDataValues>();
-            if (searchString == "")
+            if (searchString == "" || searchString == " ")
             {
                 matches = QBanData.Values.ToList();
             }

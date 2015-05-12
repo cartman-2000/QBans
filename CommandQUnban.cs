@@ -41,7 +41,14 @@ namespace QBan
 
             if (command.Length > 1)
             {
-                RocketChatManager.Say(caller, "Invalid arguments in command.");
+                RocketChatManager.Say(caller, "Error: Too many arguments in command.");
+                return;
+            }
+
+            // Fail on invalid steam id or missing playername.
+            if (command[0] == "" || command[0] == " " || command[0] == "0")
+            {
+                RocketChatManager.Say(caller, "Error: Invalid player name in unban command.");
                 return;
             }
 
@@ -93,7 +100,7 @@ namespace QBan
                     }
                     else
                     {
-                        RocketChatManager.Say(caller, String.Format("Could not find player by ID {0} to unban.", command));
+                        RocketChatManager.Say(caller, String.Format("Error: Could not find player by ID {0} to unban.", command));
                         return;
                     }
                 }
@@ -108,7 +115,7 @@ namespace QBan
                 // Player hasen't been found.
                 else
                 {
-                    RocketChatManager.Say(caller, String.Format("Could not find player {0} to unban.", command));
+                    RocketChatManager.Say(caller, String.Format("Error: Could not find player {0} to unban.", command));
                     return;
                 }
             }

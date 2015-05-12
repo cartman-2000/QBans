@@ -39,23 +39,28 @@ namespace QBan
                 }
             }
 
-            if (command.Length >= 1)
-            {
-                if (command.Length == 1 && QBan.Instance.Configuration.ReasonManditory)
-                {
-                    RocketChatManager.Say(caller, "Error: Reason is manditory on kick command.");
-                    return;
-                }
-                else if (command[1] == "" && QBan.Instance.Configuration.ReasonManditory)
-                {
-                    RocketChatManager.Say(caller, "Error: Reason is manditory on kick command.");
-                    return;
-                }
-            }
-
             if(command.Length > 2)
             {
-                RocketChatManager.Say(caller, "Invalid arguments in command.");
+                RocketChatManager.Say(caller, "Error: Too many arguments in command.");
+                return;
+            }
+
+            // Fail on invalid steam id or missing playername.
+            if (command[0] == "" || command[0] == " " || command[0] == "0")
+            {
+                RocketChatManager.Say(caller, "Error: Invalid player name in kick command.");
+                return;
+            }
+
+            // Fail if there is no reason if it has been set as mandetory.
+            if (command.Length == 1 && QBan.Instance.Configuration.ReasonManditory)
+            {
+                RocketChatManager.Say(caller, "Error: Reason is manditory on kick command.");
+                return;
+            }
+            else if ((command[1] == "" || command [1] == " ") && QBan.Instance.Configuration.ReasonManditory)
+            {
+                RocketChatManager.Say(caller, "Error: Reason is manditory on kick command.");
                 return;
             }
 

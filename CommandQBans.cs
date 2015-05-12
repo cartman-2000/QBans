@@ -33,24 +33,34 @@ namespace QBan
 
             if (command.Length > 2)
             {
-                RocketChatManager.Say(caller, "Invalid areguments in command.");
+                RocketChatManager.Say(caller, "Error: Too many areguments in command.");
                 return;
             }
 
-            // Don't support SteamID64 number in this command.
-            try
+            // Parse playername in bans command.
+            string target = "";
+            if (command.Length > 0)
             {
-                if (command.Length > 0)
+                if (command[0] == "help")
+                {
+                    RocketChatManager.Say(caller, this.Help);
+                    return;
+                }
+
+                // Don't support SteamID64 number in this command.
+                try
                 {
                     // Check for id number in the command.
                     command[0].StringToCSteamID();
-                    RocketChatManager.Say(caller, "SteamID64 Number's aren't supported in this command.");
+                    RocketChatManager.Say(caller, "Error: SteamID64 Number's aren't supported in this command.");
                     return;
                 }
-            }
-            catch
-            {
-                //
+                catch
+                {
+                    //
+                }
+
+                target = command[0];
             }
 
             int recordcount;
@@ -84,21 +94,10 @@ namespace QBan
 
             }
 
-            string target = "";
-            if(command.Length > 0)
-            {
-                if (command[0] == "help")
-                {
-                    RocketChatManager.Say(caller, this.Help);
-                    return;
-                }
-                target = command[0];
-            }
-
             KeyValuePair<int, List<BanDataValues>> list = QBan.Instance.dataStore.GetQBanDataList(target, recordcount, pagination);
             if (list.Value.Count == 0)
             {
-                RocketChatManager.Say(caller, String.Format("Can't find any players by the name of: {0}", target));
+                RocketChatManager.Say(caller, String.Format("Error: Can't find any players by the name of: {0}", target));
                 return;
             }
             else
