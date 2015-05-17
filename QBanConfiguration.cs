@@ -1,14 +1,14 @@
-﻿using Rocket.RocketAPI;
+﻿using Rocket.API;
 
 namespace QBan
 {
-    public class QBanConfiguration : IRocketConfiguration
+    public class QBanConfiguration : IRocketPluginConfiguration
     {
         public bool EnableInternalSync;
         public bool EnableExpiredExport;
         public bool ReasonManditory;
 
-        public IRocketConfiguration DefaultConfiguration
+        public IRocketPluginConfiguration DefaultConfiguration
         {
             get
             {

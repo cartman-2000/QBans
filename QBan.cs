@@ -1,8 +1,10 @@
 ﻿// Plugin written by cartman-2000. https://github.com/cartman-2000/QBans
 
-using Rocket.Logging;
-using Rocket.RocketAPI;
-using Rocket.RocketAPI.Events;
+using Rocket.API;
+using Rocket.Core.Logging;
+using Rocket.Unturned.Events;
+using Rocket.Unturned.Plugins;
+using Rocket.Unturned.Player;
 using SDG;
 using Steamworks;
 using System;

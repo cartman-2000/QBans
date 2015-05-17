@@ -1,4 +1,6 @@
-﻿using Rocket.RocketAPI;
+﻿using Rocket.Unturned;
+using Rocket.Unturned.Commands;
+using Rocket.Unturned.Player;
 using SDG;
 using System;
 using System.Collections.Generic;
@@ -33,7 +35,7 @@ namespace QBan
 
             if (command.Length > 2)
             {
-                RocketChatManager.Say(caller, "Error: Too many areguments in command.");
+                RocketChat.Say(caller, "Error: Too many areguments in command.");
                 return;
             }
 
@@ -43,7 +45,7 @@ namespace QBan
             {
                 if (command[0].Trim() == "help")
                 {
-                    RocketChatManager.Say(caller, this.Help);
+                    RocketChat.Say(caller, this.Help);
                     return;
                 }
 
@@ -52,7 +54,7 @@ namespace QBan
                 {
                     // Check for id number in the command.
                     command[0].StringToCSteamID();
-                    RocketChatManager.Say(caller, "Error: SteamID64 Number's aren't supported in this command.");
+                    RocketChat.Say(caller, "Error: SteamID64 Number's aren't supported in this command.");
                     return;
                 }
                 catch
@@ -82,13 +84,13 @@ namespace QBan
                     pagination = Out;
                     if (pagination < 0)
                     {
-                        RocketChatManager.Say(caller, "Error: page number is negative.");
+                        RocketChat.Say(caller, "Error: page number is negative.");
                         return;
                     }
                 }
                 else
                 {
-                    RocketChatManager.Say(caller, "Error: page number is not a number.");
+                    RocketChat.Say(caller, "Error: page number is not a number.");
                     return;
                 }
 
@@ -97,7 +99,7 @@ namespace QBan
             KeyValuePair<int, List<BanDataValues>> list = QBan.Instance.dataStore.GetQBanDataList(target, recordcount, pagination);
             if (list.Value.Count == 0)
             {
-                RocketChatManager.Say(caller, String.Format("Error: Can't find any players by the name of: {0}", target));
+                RocketChat.Say(caller, String.Format("Error: Can't find any players by the name of: {0}", target));
                 return;
             }
             else
@@ -131,8 +133,8 @@ namespace QBan
                     }
 
                     // build the strings for the ban info.
-                    RocketChatManager.Say(caller, String.Format("{0}. {1} [{2}] ({3}), by {4} [{5}]", lineNumbers, (value.targetCharName.Length == 0 ? "Not set" : value.targetCharName.Truncate(14)), (value.targetSteamName.Length == 0 ? "Not set" : value.targetSteamName.Truncate(14)), value.targetSID.ToString(), value.adminCharName.Truncate(12), value.adminSteamName.Truncate(12)));
-                    RocketChatManager.Say(caller, String.Format("Set: {0:M/d/yy HH:mm}, Till: {1:M/d/yy}, Left: {2}, Reason: {3}", value.setTime, value.setTime.AddSeconds(value.duration), timeLeftFormat, value.reason));
+                    RocketChat.Say(caller, String.Format("{0}. {1} [{2}] ({3}), by {4} [{5}]", lineNumbers, (value.targetCharName.Length == 0 ? "Not set" : value.targetCharName.Truncate(14)), (value.targetSteamName.Length == 0 ? "Not set" : value.targetSteamName.Truncate(14)), value.targetSID.ToString(), value.adminCharName.Truncate(12), value.adminSteamName.Truncate(12)));
+                    RocketChat.Say(caller, String.Format("Set: {0:M/d/yy HH:mm}, Till: {1:M/d/yy}, Left: {2}, Reason: {3}", value.setTime, value.setTime.AddSeconds(value.duration), timeLeftFormat, value.reason));
                     lineNumbers++;
                 }
             }

@@ -34,15 +34,23 @@
   <ItemGroup>
     <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Ref\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\Rocket_Ref\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Ref\Assembly-CSharp-firstpass.dll</HintPath>
+      <HintPath>..\Rocket_Ref\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
-    <Reference Include="RocketAPI, Version=3.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Rocket.API, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Ref\RocketAPI.dll</HintPath>
+      <HintPath>..\Rocket_Ref\Rocket.API.dll</HintPath>
+    </Reference>
+    <Reference Include="Rocket.Core, Version=1.2.0.1, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Rocket_Ref\Rocket.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Rocket.Unturned, Version=4.0.0.2, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Rocket_Ref\Rocket.Unturned.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -52,7 +60,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Ref\UnityEngine.dll</HintPath>
+      <HintPath>..\Rocket_Ref\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

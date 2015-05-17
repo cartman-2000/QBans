@@ -1,5 +1,7 @@
-﻿using Rocket.Logging;
-using Rocket.RocketAPI;
+﻿using Rocket.Core.Logging;
+using Rocket.Unturned;
+using Rocket.Unturned.Commands;
+using Rocket.Unturned.Player;
 using SDG;
 using Steamworks;
 using System;
@@ -27,7 +29,7 @@ namespace QBan
         {
             if (command.Length == 0)
             {
-                RocketChatManager.Say(caller, this.Help);
+                RocketChat.Say(caller, this.Help);
                 return;
             }
 
@@ -47,7 +49,7 @@ namespace QBan
 
             if (command.Length > 4)
             {
-                RocketChatManager.Say(caller, "Too many arguments in command.");
+                RocketChat.Say(caller, "Too many arguments in command.");
                 return;
             }
 
@@ -56,12 +58,12 @@ namespace QBan
             {
                 if (playerName.Trim() == String.Empty || playerName.Trim() == "0")
                 {
-                    RocketChatManager.Say(caller, "Error: Invalid player name in ban command.");
+                    RocketChat.Say(caller, "Error: Invalid player name in ban command.");
                     return;
                 }
                 if (command.Length == 1 && QBan.Instance.Configuration.ReasonManditory)
                 {
-                    RocketChatManager.Say(caller, "Error: Reason is manditory on ban command.");
+                    RocketChat.Say(caller, "Error: Reason is manditory on ban command.");
                     return;
                 }
             }
@@ -75,7 +77,7 @@ namespace QBan
                 }
                 else if (QBan.Instance.Configuration.ReasonManditory)
                 {
-                    RocketChatManager.Say(caller, "Error: Reason is manditory on ban command.");
+                    RocketChat.Say(caller, "Error: Reason is manditory on ban command.");
                     return;
                 }
             }
@@ -85,12 +87,12 @@ namespace QBan
             {
                 if (!long.TryParse(command[2], out banDuration))
                 {
-                    RocketChatManager.Say(caller, "Error: Invalid number entered for duration.");
+                    RocketChat.Say(caller, "Error: Invalid number entered for duration.");
                     return;
                 }
                 else if (banDuration < 0)
                 {
-                    RocketChatManager.Say(caller, "Error: Duration is a negative number.");
+                    RocketChat.Say(caller, "Error: Duration is a negative number.");
                     return;
                 }
                 else if (banDuration == 0 || banDuration >= maxDuration)
@@ -114,7 +116,7 @@ namespace QBan
                         banDuration = banDuration * 60;
                         break;
                     default:
-                        RocketChatManager.Say(caller, "Error: Improper time modifier entered into command.");
+                        RocketChat.Say(caller, "Error: Improper time modifier entered into command.");
                         return;
                 }
                 if (banDuration > maxDuration)
@@ -188,7 +190,7 @@ namespace QBan
                     // Can't ban a player if the SteamID64 number can't be found. Explicitly add the ban if what was entered was a SteamID64 number.
                     if (!isCSteamID)
                     {
-                        RocketChatManager.Say(caller, String.Format("Error: Can't find a player by the name of {0}, that has played on the server before.", playerName));
+                        RocketChat.Say(caller, String.Format("Error: Can't find a player by the name of {0}, that has played on the server before.", playerName));
                         return;
                     }
                     else
@@ -202,13 +204,13 @@ namespace QBan
                             SteamBlacklist.unban(data.targetSID);
                             SteamBlacklist.save();
 
-                            RocketChatManager.Say(caller, String.Format("Player SteamID64:{0}, has been banned for {1} seconds.", data.targetSID.ToString(), data.duration.ToString()));
-                            RocketChatManager.Say(caller, String.Format("Reason: {0}", data.reason));
+                            RocketChat.Say(caller, String.Format("Player SteamID64:{0}, has been banned for {1} seconds.", data.targetSID.ToString(), data.duration.ToString()));
+                            RocketChat.Say(caller, String.Format("Reason: {0}", data.reason));
                             Logger.Log(String.Format("Admin {0}[{1}]({2}), has banned SteamID64:{3} for {4}, for {5} seconds.", callerCharName, callerSteamName, callerCSteamID.ToString(), data.targetSID.ToString(), data.reason, data.duration.ToString()));
                         }
                         else
                         {
-                            RocketChatManager.Say(caller, "Error: Was unable to set the ban record for the player.");
+                            RocketChat.Say(caller, "Error: Was unable to set the ban record for the player.");
                             return;
                         }
                     }
@@ -227,13 +229,13 @@ namespace QBan
                     SteamBlacklist.save();
                 }
 
-                RocketChatManager.Say(caller, String.Format("Player {0}[{1}], has been banned for {2} seconds.", data.targetCharName.Truncate(12), data.targetSteamName.Truncate(12), data.duration.ToString()));
-                RocketChatManager.Say(caller, String.Format("Reason: {0}", data.reason));
+                RocketChat.Say(caller, String.Format("Player {0}[{1}], has been banned for {2} seconds.", data.targetCharName.Truncate(12), data.targetSteamName.Truncate(12), data.duration.ToString()));
+                RocketChat.Say(caller, String.Format("Reason: {0}", data.reason));
                 Logger.Log(String.Format("Admin {0}[{1}]({2}), has banned player {3}[{4}]({5}) for {6}, for {7} seconds.", data.adminCharName, data.adminSteamName, data.adminSID.ToString(), data.targetCharName, data.targetSteamName, data.targetSID.ToString(), data.reason, data.duration.ToString()));
             }
             else
             {
-                RocketChatManager.Say(caller, "Error: Was unable to set the ban record for the player.");
+                RocketChat.Say(caller, "Error: Was unable to set the ban record for the player.");
             }
         }
     }

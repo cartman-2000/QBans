@@ -1,5 +1,7 @@
-﻿using Rocket.Logging;
-using Rocket.RocketAPI;
+﻿using Rocket.Core.Logging;
+using Rocket.Unturned;
+using Rocket.Unturned.Commands;
+using Rocket.Unturned.Player;
 using SDG;
 using Steamworks;
 using System;
@@ -27,7 +29,7 @@ namespace QBan
         {
             if (command.Length == 0)
             {
-                RocketChatManager.Say(caller, this.Help);
+                RocketChat.Say(caller, this.Help);
                 return;
             }
 
@@ -41,14 +43,14 @@ namespace QBan
 
             if (command.Length > 1)
             {
-                RocketChatManager.Say(caller, "Error: Too many arguments in command.");
+                RocketChat.Say(caller, "Error: Too many arguments in command.");
                 return;
             }
 
             // Fail on invalid steam id or missing playername.
             if (command[0].Trim() == String.Empty || command[0].Trim() == "0")
             {
-                RocketChatManager.Say(caller, "Error: Invalid player name in unban command.");
+                RocketChat.Say(caller, "Error: Invalid player name in unban command.");
                 return;
             }
 
@@ -100,7 +102,7 @@ namespace QBan
                     }
                     else
                     {
-                        RocketChatManager.Say(caller, String.Format("Error: Could not find player by ID {0} to unban.", command));
+                        RocketChat.Say(caller, String.Format("Error: Could not find player by ID {0} to unban.", command));
                         return;
                     }
                 }
@@ -115,7 +117,7 @@ namespace QBan
                 // Player hasen't been found.
                 else
                 {
-                    RocketChatManager.Say(caller, String.Format("Error: Could not find player {0} to unban.", command));
+                    RocketChat.Say(caller, String.Format("Error: Could not find player {0} to unban.", command));
                     return;
                 }
             }
@@ -128,7 +130,7 @@ namespace QBan
             SteamBlacklist.unban(banData.targetSID);
             SteamBlacklist.save();
 
-            RocketChatManager.Say(caller, String.Format("You have Unbanned player {0}[{1}]({2}).", banData.targetCharName, banData.targetSteamName, banData.targetSID.ToString()));
+            RocketChat.Say(caller, String.Format("You have Unbanned player {0}[{1}]({2}).", banData.targetCharName, banData.targetSteamName, banData.targetSID.ToString()));
             Logger.Log(String.Format("Admin {0}[{1}]({2}), has banned player {3}[{4}]({5}).", callerCharName, callerSteamName, callerCSteamID, banData.targetCharName, banData.targetSteamName, banData.targetSID));
         }
     }

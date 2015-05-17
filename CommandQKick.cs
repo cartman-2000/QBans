@@ -1,6 +1,8 @@
 ﻿using System;
-using Rocket.Logging;
-using Rocket.RocketAPI;
+using Rocket.Core.Logging;
+using Rocket.Unturned;
+using Rocket.Unturned.Commands;
+using Rocket.Unturned.Player;
 using SDG;
 
 namespace QBan
@@ -27,7 +29,7 @@ namespace QBan
             RocketPlayer target = null;
             if(command.Length == 0)
             {
-                RocketChatManager.Say(caller, this.Help);
+                RocketChat.Say(caller, this.Help);
                 return;
             }
 
@@ -41,26 +43,26 @@ namespace QBan
 
             if(command.Length > 2)
             {
-                RocketChatManager.Say(caller, "Error: Too many arguments in command.");
+                RocketChat.Say(caller, "Error: Too many arguments in command.");
                 return;
             }
 
             // Fail on invalid steam id or missing playername.
             if (command[0].Trim() == String.Empty || command[0].Trim() == "0")
             {
-                RocketChatManager.Say(caller, "Error: Invalid player name in kick command.");
+                RocketChat.Say(caller, "Error: Invalid player name in kick command.");
                 return;
             }
 
             // Fail if there is no reason if it has been set as mandetory.
             if (command.Length == 1 && QBan.Instance.Configuration.ReasonManditory)
             {
-                RocketChatManager.Say(caller, "Error: Reason is manditory on kick command.");
+                RocketChat.Say(caller, "Error: Reason is manditory on kick command.");
                 return;
             }
             else if (command[1].Trim() == String.Empty && QBan.Instance.Configuration.ReasonManditory)
             {
-                RocketChatManager.Say(caller, "Error: Reason is manditory on kick command.");
+                RocketChat.Say(caller, "Error: Reason is manditory on kick command.");
                 return;
             }
 
@@ -85,7 +87,10 @@ namespace QBan
                 target.Kick(reason);
                 if (caller != null)
                 {
-                    RocketChatManager.Say(caller, String.Format("You've kicked player {0}[{1}]({2}).", target.CharacterName, target.SteamName, target.CSteamID));
+                    if (caller != target)
+                    {
+                        RocketChat.Say(caller, String.Format("You've kicked player {0}[{1}]({2}).", target.CharacterName, target.SteamName, target.CSteamID));
+                    }
                     Logger.Log(String.Format("Player {0}[{1}]({2}) has been kicked by admin {3}[{4}]({5}). Reason: {6}", target.CharacterName, target.SteamName, target.CSteamID, caller.CharacterName, caller.SteamName, caller.CSteamID, reason));
                 }
                 else
@@ -95,7 +100,7 @@ namespace QBan
             }
             catch
             {
-                RocketChatManager.Say(caller, String.Format("Player {0} not found.", command[0]));
+                RocketChat.Say(caller, String.Format("Player {0} not found.", command[0]));
             }
         }
     }
