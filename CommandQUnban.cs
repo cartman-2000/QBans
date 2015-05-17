@@ -46,7 +46,7 @@ namespace QBan
             }
 
             // Fail on invalid steam id or missing playername.
-            if (command[0] == "" || command[0] == " " || command[0] == "0")
+            if (command[0].Trim() == String.Empty || command[0].Trim() == "0")
             {
                 RocketChatManager.Say(caller, "Error: Invalid player name in unban command.");
                 return;

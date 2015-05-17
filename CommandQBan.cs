@@ -54,7 +54,7 @@ namespace QBan
             // Fail on invalid steam id or missing playername.
             if (command.Length >= 1)
             {
-                if (playerName == "" || playerName == " " || playerName == "0")
+                if (playerName.Trim() == String.Empty || playerName.Trim() == "0")
                 {
                     RocketChatManager.Say(caller, "Error: Invalid player name in ban command.");
                     return;
@@ -69,9 +69,9 @@ namespace QBan
             // Set reason for ban, if one has been set.
             if (command.Length >= 2)
             {
-                if (command[1].Replace("><", "") != "" && command[1].Replace("><", "") != " ")
+                if (command[1].Replace("><", "").Trim() != String.Empty)
                 {
-                    banReason = command[1].Replace("><", "");
+                    banReason = command[1].Replace("><", "").Trim();
                 }
                 else if (QBan.Instance.Configuration.ReasonManditory)
                 {
@@ -102,24 +102,22 @@ namespace QBan
             // Parse and handle time modifier.
             if (command.Length == 4)
             {
-                if (command[3] != "d" && command[3] != "h" && command[3] != "m")
+                switch (command[3].ToLower())
                 {
-                    RocketChatManager.Say(caller, "Error: Improper time modifier entered into command.");
-                    return;
+                    case "d":
+                        banDuration = banDuration * (60 * 60 * 24);
+                        break;
+                    case "h":
+                        banDuration = banDuration * (60 * 60);
+                        break;
+                    case "m":
+                        banDuration = banDuration * 60;
+                        break;
+                    default:
+                        RocketChatManager.Say(caller, "Error: Improper time modifier entered into command.");
+                        return;
                 }
-                if (command[3] == "d" && banDuration * (60 * 60 * 24) < maxDuration)
-                {
-                    banDuration = banDuration * (60 * 60 * 24);
-                }
-                else if (command[3] == "h" && banDuration * (60 * 60) < maxDuration)
-                {
-                    banDuration = banDuration * (60 * 60);
-                }
-                else if (command[3] == "m" && banDuration * 60 < maxDuration)
-                {
-                    banDuration = banDuration * 60;
-                }
-                else
+                if (banDuration > maxDuration)
                 {
                     banDuration = maxDuration;
                 }

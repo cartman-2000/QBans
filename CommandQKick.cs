@@ -46,7 +46,7 @@ namespace QBan
             }
 
             // Fail on invalid steam id or missing playername.
-            if (command[0] == "" || command[0] == " " || command[0] == "0")
+            if (command[0].Trim() == String.Empty || command[0].Trim() == "0")
             {
                 RocketChatManager.Say(caller, "Error: Invalid player name in kick command.");
                 return;
@@ -58,7 +58,7 @@ namespace QBan
                 RocketChatManager.Say(caller, "Error: Reason is manditory on kick command.");
                 return;
             }
-            else if ((command[1] == "" || command [1] == " ") && QBan.Instance.Configuration.ReasonManditory)
+            else if (command[1].Trim() == String.Empty && QBan.Instance.Configuration.ReasonManditory)
             {
                 RocketChatManager.Say(caller, "Error: Reason is manditory on kick command.");
                 return;

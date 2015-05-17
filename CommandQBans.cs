@@ -41,7 +41,7 @@ namespace QBan
             string target = "";
             if (command.Length > 0)
             {
-                if (command[0] == "help")
+                if (command[0].Trim() == "help")
                 {
                     RocketChatManager.Say(caller, this.Help);
                     return;
@@ -60,7 +60,7 @@ namespace QBan
                     //
                 }
 
-                target = command[0];
+                target = command[0].Trim();
             }
 
             int recordcount;
