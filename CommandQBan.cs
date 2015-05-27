@@ -22,14 +22,19 @@ namespace QBan
 
         public string Help
         {
-            get { return "[\"Playername\"|SteamID64] [\"reason\"] [duration] [d|h|m] - bans player, no duration for permban, 4th peram is days, hours, or minutes."; }
+            get { return "Bans player, no duration for permban, 4th peram is days, hours, or minutes."; }
+        }
+
+        public string Syntax
+        {
+            get { return "<\"Playername\"|SteamID64> <\"reason\"> [duration] [d|h|m]"; }
         }
 
         public void Execute(RocketPlayer caller, params string[] command)
         {
             if (command.Length == 0)
             {
-                RocketChat.Say(caller, this.Help);
+                RocketChat.Say(caller, this.Syntax + " - " + this.Help);
                 return;
             }
 

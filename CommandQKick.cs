@@ -11,7 +11,12 @@ namespace QBan
     {
         public string Help
         {
-            get { return "[\"playername\"|SteamID64] [\"Reason\"] - Kicks a player."; }
+            get { return "Kicks a player."; }
+        }
+
+        public string Syntax
+        {
+            get { return "<\"playername\"|SteamID64> <\"Reason\">"; }
         }
 
         public string Name
@@ -29,7 +34,7 @@ namespace QBan
             RocketPlayer target = null;
             if(command.Length == 0)
             {
-                RocketChat.Say(caller, this.Help);
+                RocketChat.Say(caller, this.Syntax + " - " + this.Help);
                 return;
             }
 

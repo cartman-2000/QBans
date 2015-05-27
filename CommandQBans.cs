@@ -20,7 +20,12 @@ namespace QBan
 
         public string Help
         {
-            get { return "[\"playername\"] [page] - Shows a list of bans on the server, use playername to narrow the list."; }
+            get { return "Shows a list of bans on the server, use playername to narrow the list."; }
+        }
+
+        public string Syntax
+        {
+            get { return "[\"playername\"] [page]"; }
         }
 
         public void Execute(RocketPlayer caller, params string[] command)
@@ -45,7 +50,7 @@ namespace QBan
             {
                 if (command[0].Trim() == "help")
                 {
-                    RocketChat.Say(caller, this.Help);
+                    RocketChat.Say(caller, this.Syntax + " - " + this.Help);
                     return;
                 }
 

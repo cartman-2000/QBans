@@ -22,14 +22,19 @@ namespace QBan
 
         public string Help
         {
-            get { return "[\"Playername\"|SteamID64] - Unbans a player on the server."; }
+            get { return "Unbans a player on the server."; }
+        }
+
+        public string Syntax
+        {
+            get { return "<\"playername\"|SteamID64>"; }
         }
 
         public void Execute(RocketPlayer caller, params string[] command)
         {
             if (command.Length == 0)
             {
-                RocketChat.Say(caller, this.Help);
+                RocketChat.Say(caller, this.Syntax + " - " + this.Help);
                 return;
             }
 
