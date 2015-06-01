@@ -135,8 +135,8 @@ namespace QBan
             SteamBlacklist.unban(banData.targetSID);
             SteamBlacklist.save();
 
-            RocketChat.Say(caller, String.Format("You have Unbanned player {0}[{1}]({2}).", banData.targetCharName, banData.targetSteamName, banData.targetSID.ToString()));
-            Logger.Log(String.Format("Admin {0}[{1}]({2}), has banned player {3}[{4}]({5}).", callerCharName, callerSteamName, callerCSteamID, banData.targetCharName, banData.targetSteamName, banData.targetSID));
+            RocketChat.Say(caller, String.Format("You have unbanned player {0}[{1}]({2}).", banData.targetCharName, banData.targetSteamName, banData.targetSID.ToString()));
+            Logger.Log(String.Format("Admin {0}[{1}]({2}), has unbanned player {3}[{4}]({5}).", callerCharName, callerSteamName, callerCSteamID, banData.targetCharName, banData.targetSteamName, banData.targetSID));
         }
     }
 }
