@@ -4,6 +4,7 @@ using Rocket.Unturned.Player;
 using SDG;
 using System;
 using System.Collections.Generic;
+
 namespace QBan
 {
     class CommandQBans : IRocketCommand
@@ -26,6 +27,11 @@ namespace QBan
         public string Syntax
         {
             get { return "[\"playername\"] [page]"; }
+        }
+
+        public List<string> Aliases
+        {
+            get { return new List<string>(); }
         }
 
         public void Execute(RocketPlayer caller, params string[] command)

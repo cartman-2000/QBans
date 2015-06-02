@@ -5,6 +5,7 @@ using Rocket.Unturned.Player;
 using SDG;
 using Steamworks;
 using System;
+using System.Collections.Generic;
 
 namespace QBan
 {
@@ -28,6 +29,11 @@ namespace QBan
         public string Syntax
         {
             get { return "<\"playername\"|SteamID64>"; }
+        }
+
+        public List<string> Aliases
+        {
+            get { return new List<string>(); }
         }
 
         public void Execute(RocketPlayer caller, params string[] command)

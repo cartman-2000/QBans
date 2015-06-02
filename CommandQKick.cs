@@ -4,6 +4,7 @@ using Rocket.Unturned;
 using Rocket.Unturned.Commands;
 using Rocket.Unturned.Player;
 using SDG;
+using System.Collections.Generic;
 
 namespace QBan
 {
@@ -27,6 +28,11 @@ namespace QBan
         public bool RunFromConsole
         {
             get { return true; }
+        }
+
+        public List<string> Aliases
+        {
+            get { return new List<string>(); }
         }
 
         public void Execute(RocketPlayer caller, params string[] command)
