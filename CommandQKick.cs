@@ -3,7 +3,6 @@ using Rocket.Core.Logging;
 using Rocket.Unturned;
 using Rocket.Unturned.Commands;
 using Rocket.Unturned.Player;
-using SDG;
 using System.Collections.Generic;
 
 namespace QBan
@@ -42,14 +41,6 @@ namespace QBan
             {
                 RocketChat.Say(caller, this.Syntax + " - " + this.Help);
                 return;
-            }
-
-            if (command.Length == 1)
-            {
-                if (command[0].Contains("/"))
-                {
-                    command = Parser.getComponentsFromSerial(command[0], '/');
-                }
             }
 
             if(command.Length > 2)

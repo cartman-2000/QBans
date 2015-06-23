@@ -1,11 +1,10 @@
 ﻿using Rocket.Core.Logging;
-using SDG;
+using SDG.Unturned;
 using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-
 
 namespace QBan
 {

@@ -5,7 +5,7 @@ using Rocket.Core.Logging;
 using Rocket.Unturned.Events;
 using Rocket.Unturned.Plugins;
 using Rocket.Unturned.Player;
-using SDG;
+using SDG.Unturned;
 using Steamworks;
 using System;
 using System.Linq;
