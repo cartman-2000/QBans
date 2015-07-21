@@ -3,6 +3,7 @@ using Rocket.Unturned.Commands;
 using Rocket.Unturned.Player;
 using System;
 using System.Collections.Generic;
+using Rocket.Core.Logging;
 
 namespace QBan
 {
@@ -137,13 +138,14 @@ namespace QBan
                     // build the strings for the ban info.
                     if (caller == null)
                     {
-                        RocketChat.Say(caller, String.Format("{0}. {1} [{2}] ({3}), by {4} [{5}]", lineNumbers, (value.targetCharName.Length == 0 ? "Not set" : value.targetCharName), (value.targetSteamName.Length == 0 ? "Not set" : value.targetSteamName), value.targetSID.ToString(), value.adminCharName, value.adminSteamName));
+                        Logger.Log(String.Format("{0}. {1} [{2}] ({3}), by {4} [{5}]", lineNumbers, (value.targetCharName.Length == 0 ? "Not set" : value.targetCharName), (value.targetSteamName.Length == 0 ? "Not set" : value.targetSteamName), value.targetSID.ToString(), value.adminCharName, value.adminSteamName));
+                        Logger.Log(String.Format("Set: {0:M/d/yy HH:mm}, Till: {1:M/d/yy}, Left: {2}, Reason: {3}", value.setTime, value.setTime.AddSeconds(value.duration), timeLeftFormat, value.reason));
                     }
                     else
                     {
                         RocketChat.Say(caller, String.Format("{0}. {1} [{2}] ({3}), by {4} [{5}]", lineNumbers, (value.targetCharName.Length == 0 ? "Not set" : value.targetCharName.Truncate(14)), (value.targetSteamName.Length == 0 ? "Not set" : value.targetSteamName.Truncate(14)), value.targetSID.ToString(), value.adminCharName.Truncate(12), value.adminSteamName.Truncate(12)));
+                        RocketChat.Say(caller, String.Format("Set: {0:M/d/yy HH:mm}, Till: {1:M/d/yy}, Left: {2}, Reason: {3}", value.setTime, value.setTime.AddSeconds(value.duration), timeLeftFormat, value.reason));
                     }
-                    RocketChat.Say(caller, String.Format("Set: {0:M/d/yy HH:mm}, Till: {1:M/d/yy}, Left: {2}, Reason: {3}", value.setTime, value.setTime.AddSeconds(value.duration), timeLeftFormat, value.reason));
                     lineNumbers++;
                 }
             }
