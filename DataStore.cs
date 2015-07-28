@@ -10,10 +10,10 @@ namespace QBan
 {
     public class DataStore
     {
-        private static string QBansBaseDir = String.Format("Servers/{0}/Rocket/plugins/QBans", Steam.InstanceName);
-        private static string QBansBansFile = String.Format("Servers/{0}/Rocket/Plugins/QBans/BansData.txt", Steam.InstanceName);
-        private static string QBansBansbackupFile = String.Format("Servers/{0}/Rocket/Plugins/QBans/BansData_bk.txt", Steam.InstanceName);
-        private static string QBansBansExpiredExportFile = String.Format("Servers/{0}/Rocket/Plugins/QBans/BansData_Expired.txt", Steam.InstanceName);
+        private static string QBansBaseDir = "Plugins/QBans";
+        private static string QBansBansFile = "Plugins/QBans/BansData.txt";
+        private static string QBansBansbackupFile = "Plugins/QBans/BansData_bk.txt";
+        private static string QBansBansExpiredExportFile = "Plugins/QBans/BansData_Expired.txt";
         private static string QBansBansFileHeader = "## Data file for the queued bans, format: target_sid><target_charname><target_steamname><admin_sid><admin_charname><admin_steamname><reason><duration><set_time";
 
         private static Dictionary<CSteamID, BanDataValues> QBanData = new Dictionary<CSteamID, BanDataValues>();
@@ -33,10 +33,12 @@ namespace QBan
             }
 
             string[] lines = File.ReadAllLines(@QBansBansFile);
+            int i = 1;
             foreach (string value in lines)
             {
                 if (value != "" && !value.StartsWith("##"))
                 {
+                    i++;
                     //use new style string splitting delimiter or old one based on what it matches.
                     String[] componentsFromSerial;
                     if (value.Contains("><"))
@@ -50,25 +52,32 @@ namespace QBan
 
                     if (componentsFromSerial.Length == 9)
                     {
-                        uint banDuration;
-                        long banTime;
-                        uint.TryParse(componentsFromSerial[7], out banDuration);
-                        long.TryParse(componentsFromSerial[8], out banTime);
+                        try
+                        {
+                            uint banDuration;
+                            long banTime;
+                            uint.TryParse(componentsFromSerial[7], out banDuration);
+                            long.TryParse(componentsFromSerial[8], out banTime);
 
-                        BanDataValues BanDataValue = new BanDataValues();
-                        BanDataValue.targetSID = componentsFromSerial[0].StringToCSteamID();
-                        BanDataValue.targetCharName = componentsFromSerial[1];
-                        BanDataValue.targetSteamName = componentsFromSerial[2];
+                            BanDataValues BanDataValue = new BanDataValues();
+                            BanDataValue.targetSID = componentsFromSerial[0].StringToCSteamID();
+                            BanDataValue.targetCharName = componentsFromSerial[1];
+                            BanDataValue.targetSteamName = componentsFromSerial[2];
 
-                        BanDataValue.adminSID = componentsFromSerial[3].StringToCSteamID();
-                        BanDataValue.adminCharName = componentsFromSerial[4];
-                        BanDataValue.adminSteamName = componentsFromSerial[5];
+                            BanDataValue.adminSID = componentsFromSerial[3].StringToCSteamID();
+                            BanDataValue.adminCharName = componentsFromSerial[4];
+                            BanDataValue.adminSteamName = componentsFromSerial[5];
 
-                        BanDataValue.reason = componentsFromSerial[6];
-                        BanDataValue.duration = banDuration;
-                        BanDataValue.setTime = DateTime.FromBinary(banTime);
+                            BanDataValue.reason = componentsFromSerial[6];
+                            BanDataValue.duration = banDuration;
+                            BanDataValue.setTime = DateTime.FromBinary(banTime);
 
-                        QBanData.Add(componentsFromSerial[0].StringToCSteamID(), BanDataValue);
+                            QBanData.Add(componentsFromSerial[0].StringToCSteamID(), BanDataValue);
+                        }
+                        catch
+                        {
+                            Logger.LogWarning(String.Format("Error in parsing ban record entry, line: {0} of {1}.", i, lines.Count()));
+                        }
                     }
                     else
                     {
@@ -76,6 +85,11 @@ namespace QBan
                     }
                 }
             }
+        }
+
+        public void Unload()
+        {
+            QBanData.Clear();
         }
 
         // Set ban data and save out to file.
@@ -145,11 +159,11 @@ namespace QBan
             List<BanDataValues> matches = new List<BanDataValues>();
             if (searchString == String.Empty)
             {
-                matches = QBanData.Values.ToList();
+                matches = QBanData.Values.OrderBy(o => o.setTime).ToList();
             }
             else
             {
-                matches = QBanData.Values.Where(contents => contents.targetCharName.ToLower().Contains(searchString.ToLower()) || contents.targetSteamName.ToLower().Contains(searchString.ToLower())).ToList();
+                matches = QBanData.Values.Where(contents => contents.targetCharName.ToLower().Contains(searchString.ToLower()) || contents.targetSteamName.ToLower().Contains(searchString.ToLower())).OrderBy(o => o.setTime).ToList();
             }
             int matchCount = matches.Count;
             int index;
@@ -187,7 +201,7 @@ namespace QBan
                     SteamBlacklist.save();
                 }
             }
-            if (QBan.Instance.Configuration.EnableExpiredExport && expiredList.Count != 0)
+            if (QBan.Instance.Configuration.Instance.EnableExpiredExport && expiredList.Count != 0)
             {
                 StreamWriter file = new StreamWriter(QBansBansExpiredExportFile, true);
                 foreach (CSteamID cSteamID in expiredList)

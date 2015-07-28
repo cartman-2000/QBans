@@ -2,7 +2,8 @@
 
 using Rocket.API;
 using Rocket.Core.Logging;
-using Rocket.Unturned.Events;
+using Rocket.Core.Plugins;
+using Rocket.Unturned;
 using Rocket.Unturned.Plugins;
 using Rocket.Unturned.Player;
 using SDG.Unturned;
@@ -10,6 +11,8 @@ using Steamworks;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+
+
 
 namespace QBan
 {
@@ -26,7 +29,12 @@ namespace QBan
         {
             Instance = this;
             dataStore = new DataStore();
-            RocketServerEvents.OnPlayerConnected += Events_OnPlayerConnected;
+            U.Events.OnPlayerConnected += Events_OnPlayerConnected;
+        }
+
+        protected override void Unload()
+        {
+            dataStore.Unload();
         }
 
         // search by name of a previous player.
@@ -58,16 +66,16 @@ namespace QBan
 
         public void FixedUpdate()
         {
-            if(this.Loaded)
+            if (this.State == PluginState.Loaded)
             {
                 if ((DateTime.Now - lastCalledTimer).TotalSeconds > 600)
                 {
-                    if (Configuration.EnableInternalSync)
+                    lastCalledTimer = DateTime.Now;
+                    if (Configuration.Instance.EnableInternalSync)
                     {
                         QueueBanSync();
                     }
                     dataStore.CheckExpiredBanData();
-                    lastCalledTimer = DateTime.Now;
                 }
             }
         }
@@ -90,7 +98,7 @@ namespace QBan
             BanSync.Clear();
         }
 
-        public void Events_OnPlayerConnected(RocketPlayer player)
+        public void Events_OnPlayerConnected(UnturnedPlayer player)
         {
             if (!Players.ContainsKey(player.CSteamID))
             {
@@ -143,7 +151,7 @@ namespace QBan
                 // Have to send the adding to the blacklist to a timed update as it would NRE here, 
                 // SteamBlacklist.ban also calls ban on the player which causes the same NRE as kicking them do here.
                 // Only sync to the internal blacklist if syncing has been enabled in the config file.
-                if (!BanSync.ContainsKey(player.CSteamID) && Configuration.EnableInternalSync)
+                if (!BanSync.ContainsKey(player.CSteamID) && Configuration.Instance.EnableInternalSync)
                 {
                     BanSync.Add(player.CSteamID, checkBan);
                 }

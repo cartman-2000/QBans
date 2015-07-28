@@ -1,15 +1,15 @@
-﻿using Rocket.Unturned;
+﻿using Rocket.API;
+using Rocket.Core.Logging;
+using Rocket.Unturned.Chat;
 using Rocket.Unturned.Commands;
-using Rocket.Unturned.Player;
 using System;
 using System.Collections.Generic;
-using Rocket.Core.Logging;
 
 namespace QBan
 {
     class CommandQBans : IRocketCommand
     {
-        public bool RunFromConsole
+        public bool AllowFromConsole
         {
             get { return true; }
         }
@@ -26,7 +26,7 @@ namespace QBan
 
         public string Syntax
         {
-            get { return "[\"playername\"] [page]"; }
+            get { return "<page> [\"playername\"]"; }
         }
 
         public List<string> Aliases
@@ -34,43 +34,33 @@ namespace QBan
             get { return new List<string>(); }
         }
 
-        public void Execute(RocketPlayer caller, params string[] command)
+        public List<string> Permissions
+        {
+            get { return new List<string>() { "qban.bans" }; }
+        }
+
+        public void Execute(IRocketPlayer caller, params string[] command)
         {
             if (command.Length > 2)
             {
-                RocketChat.Say(caller, "Error: Too many areguments in command.");
+                UnturnedChat.Say(caller, "Error: Too many areguments in command.");
                 return;
             }
 
             // Parse playername in bans command.
-            string target = "";
-            if (command.Length > 0)
+            string target = command.GetStringParameter(1) != null ? command.GetStringParameter(1) : "";
+            if (command.Length == 1)
             {
                 if (command[0].Trim() == "help")
                 {
-                    RocketChat.Say(caller, this.Syntax + " - " + this.Help);
+                    UnturnedChat.Say(caller, this.Syntax + " - " + this.Help);
                     return;
                 }
-
-                // Don't support SteamID64 number in this command.
-                try
-                {
-                    // Check for id number in the command.
-                    command[0].StringToCSteamID();
-                    RocketChat.Say(caller, "Error: SteamID64 Number's aren't supported in this command.");
-                    return;
-                }
-                catch
-                {
-                    //
-                }
-
-                target = command[0].Trim();
             }
 
             int recordcount;
             int pagination = 1;
-            if (caller == null)
+            if (caller is ConsolePlayer)
             {
                 recordcount = 10;
             }
@@ -79,30 +69,25 @@ namespace QBan
                 recordcount = 4;
             }
 
-            if (command.Length == 2)
+            if (command.GetInt32Parameter(0) != null)
             {
-                int Out;
-                if (int.TryParse(command[1], out Out))
+                pagination = (int)command.GetInt32Parameter(0);
+                if (pagination < 1)
                 {
-                    pagination = Out;
-                    if (pagination < 0)
-                    {
-                        RocketChat.Say(caller, "Error: page number is negative.");
-                        return;
-                    }
-                }
-                else
-                {
-                    RocketChat.Say(caller, "Error: page number is not a number.");
+                    UnturnedChat.Say(caller, "Error: Page number is zero, or negative.");
                     return;
                 }
-
+            }
+            else if (command.Length > 0)
+            {
+                UnturnedChat.Say(caller, "Error: Page number is not a number.");
+                return;
             }
 
             KeyValuePair<int, List<BanDataValues>> list = QBan.Instance.dataStore.GetQBanDataList(target, recordcount, pagination);
             if (list.Value.Count == 0)
             {
-                RocketChat.Say(caller, String.Format("Error: Can't find any players by the name of: {0}", target));
+                UnturnedChat.Say(caller, String.Format("Error: Can't find any players by the name of: {0}", target));
                 return;
             }
             else
@@ -136,15 +121,15 @@ namespace QBan
                     }
 
                     // build the strings for the ban info.
-                    if (caller == null)
+                    if (caller is ConsolePlayer)
                     {
                         Logger.Log(String.Format("{0}. {1} [{2}] ({3}), by {4} [{5}]", lineNumbers, (value.targetCharName.Length == 0 ? "Not set" : value.targetCharName), (value.targetSteamName.Length == 0 ? "Not set" : value.targetSteamName), value.targetSID.ToString(), value.adminCharName, value.adminSteamName));
                         Logger.Log(String.Format("Set: {0:M/d/yy HH:mm}, Till: {1:M/d/yy}, Left: {2}, Reason: {3}", value.setTime, value.setTime.AddSeconds(value.duration), timeLeftFormat, value.reason));
                     }
                     else
                     {
-                        RocketChat.Say(caller, String.Format("{0}. {1} [{2}] ({3}), by {4} [{5}]", lineNumbers, (value.targetCharName.Length == 0 ? "Not set" : value.targetCharName.Truncate(14)), (value.targetSteamName.Length == 0 ? "Not set" : value.targetSteamName.Truncate(14)), value.targetSID.ToString(), value.adminCharName.Truncate(12), value.adminSteamName.Truncate(12)));
-                        RocketChat.Say(caller, String.Format("Set: {0:M/d/yy HH:mm}, Till: {1:M/d/yy}, Left: {2}, Reason: {3}", value.setTime, value.setTime.AddSeconds(value.duration), timeLeftFormat, value.reason));
+                        UnturnedChat.Say(caller, String.Format("{0}. {1} [{2}] ({3}), by {4} [{5}]", lineNumbers, (value.targetCharName.Length == 0 ? "Not set" : value.targetCharName.Truncate(14)), (value.targetSteamName.Length == 0 ? "Not set" : value.targetSteamName.Truncate(14)), value.targetSID.ToString(), value.adminCharName.Truncate(12), value.adminSteamName.Truncate(12)));
+                        UnturnedChat.Say(caller, String.Format("Set: {0:M/d/yy HH:mm}, Till: {1:M/d/yy}, Left: {2}, Reason: {3}", value.setTime, value.setTime.AddSeconds(value.duration), timeLeftFormat, value.reason));
                     }
                     lineNumbers++;
                 }
