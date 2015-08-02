@@ -1,10 +1,10 @@
-﻿using Rocket.Core.Logging;
-using SDG.Unturned;
-using Steamworks;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using SDG.Unturned;
+using Steamworks;
+using Rocket.Core.Logging;
 
 namespace QBan
 {
@@ -108,7 +108,7 @@ namespace QBan
             }
             catch
             {
-                Logger.LogWarning("Error, Unable to set ban data, wrong number of array elements.");
+                Logger.LogWarning("Error, Unable to set ban data.");
                 return false;
             }
         }
@@ -128,14 +128,7 @@ namespace QBan
         // Search by playername.
         public BanDataValues GetQBanData(string playername)
         {
-            try
-            {
-                return QBanData.Values.First(contents => contents.targetCharName.ToLower().Contains(playername.ToLower()) || contents.targetSteamName.ToLower().Contains(playername.ToLower()));
-            }
-            catch
-            {
-                return new BanDataValues();
-            }
+            return QBanData.Values.FirstOrDefault(contents => contents.targetCharName.ToLower().Contains(playername.ToLower()) || contents.targetSteamName.ToLower().Contains(playername.ToLower()));
         }
 
         // Get exact match by CSteamID.
@@ -148,7 +141,7 @@ namespace QBan
             }
             else
             {
-                return new BanDataValues();
+                return null;
             }
         }
 
@@ -191,34 +184,26 @@ namespace QBan
         // Check for expired bans in the ban data, remove expired.
         public void CheckExpiredBanData()
         {
-            List<CSteamID> expiredList = new List<CSteamID>();
-            foreach (KeyValuePair<CSteamID, BanDataValues> pair in QBanData)
+            List<BanDataValues> expiredList = QBanData.Values.Where(contents => (contents.duration - (DateTime.Now - contents.setTime).TotalSeconds) <= 0).ToList();
+            foreach (BanDataValues banData in expiredList)
             {
-                if ((pair.Value.duration - (DateTime.Now - pair.Value.setTime).TotalSeconds) <= 0)
-                {
-                    expiredList.Add(pair.Key);
-                    SteamBlacklist.unban(pair.Key);
-                    SteamBlacklist.save();
-                }
+                Logger.Log(String.Format("Ban for player: {0}[{1}]({2}), has expired.",banData.targetCharName, banData.targetSteamName, banData.targetSID));
+                QBanData.Remove(banData.targetSID);
+                SteamBlacklist.unban(banData.targetSID);
             }
             if (QBan.Instance.Configuration.Instance.EnableExpiredExport && expiredList.Count != 0)
             {
                 StreamWriter file = new StreamWriter(QBansBansExpiredExportFile, true);
-                foreach (CSteamID cSteamID in expiredList)
+                foreach (BanDataValues banData in expiredList)
                 {
-                    BanDataValues data;
-                    QBanData.TryGetValue(cSteamID, out data);
-                    WriteLine(file, data);
+                    WriteLine(file, banData);
                 }
                 file.Close();
-            }
-            foreach (CSteamID key in expiredList)
-            {
-                QBanData.Remove(key);
             }
             if (expiredList.Count != 0)
             {
                 SaveToFile();
+                SteamBlacklist.save();
             }
         }
 
@@ -228,13 +213,9 @@ namespace QBan
             //Create the folder where the data file is to be stored
             Directory.CreateDirectory(QBansBaseDir);
             //create a backup of the main data file before writing to it.
-            if (File.Exists(QBansBansbackupFile))
-            {
-                File.Delete(QBansBansbackupFile);
-            }
             if (File.Exists(QBansBansFile))
             {
-                File.Copy(QBansBansFile, QBansBansbackupFile);
+                File.Copy(QBansBansFile, QBansBansbackupFile, true);
             }
             // Iterate through the dictionary and parse the entries out to file.
             StreamWriter file = new StreamWriter(QBansBansFile, false);

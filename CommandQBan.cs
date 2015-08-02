@@ -50,7 +50,7 @@ namespace QBan
                 return;
             }
 
-            SteamPlayer target = null;
+            UnturnedPlayer target = null;
             long banDuration = 1000000000;
             long maxDuration = banDuration;
             string banReason = "Banned";
@@ -165,19 +165,20 @@ namespace QBan
             data.setTime = DateTime.Now;
 
             // Running player checks.
-            if (PlayerTool.tryGetSteamPlayer(playerName, out target))
+            target = UnturnedPlayer.FromName(playerName);
+            if (target != null)
             {
                 // player is online, handle them normally.
-                data.targetSID = target.SteamPlayerID.CSteamID;
-                data.targetCharName = target.SteamPlayerID.CharacterName.Replace("><", "");
-                data.targetSteamName = target.SteamPlayerID.SteamName.Replace("><", "");
+                data.targetSID = target.CSteamID;
+                data.targetCharName = target.CharacterName.Replace("><", "");
+                data.targetSteamName = target.SteamName.Replace("><", "");
                 SetBan(caller, data);
             }
             else
             {
                 // Player is either entered incorrectly or is offline, run checks to see if the player can be found out of the previous players dictionary, or directly ban for an entered SteamID64 number.
                 // Got a hit on the GetPlayer info, they have previously played on the server since last start.
-                if (getPlayer.playerSID != (CSteamID)0)
+                if (getPlayer != null)
                 {
                     data.targetSID = getPlayer.playerSID;
                     data.targetCharName = getPlayer.playerCharName.Replace("><", "");

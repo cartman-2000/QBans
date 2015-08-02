@@ -5,7 +5,6 @@ using Steamworks;
 using Rocket.API;
 using Rocket.Core.Logging;
 using Rocket.Unturned.Chat;
-using Rocket.Unturned.Commands;
 using Rocket.Unturned.Player;
 
 namespace QBan
@@ -59,7 +58,7 @@ namespace QBan
             // Fail on invalid steam id or missing playername.
             if (command[0].Trim() == String.Empty || command[0].Trim() == "0")
             {
-                UnturnedChat.Say(caller, "Error: Invalid player name in unban command.");
+                UnturnedChat.Say(caller, String.Format("Error: Could not find player by ID {0} to unban.", command));
                 return;
             }
 
@@ -93,17 +92,16 @@ namespace QBan
                 isCSteamID = false;
             }
 
-            if (isCSteamID)
+            if (banData != null)
             {
                 // Player has been found.
-                if (banData.targetSID != (CSteamID)0)
+                RemoveBan(caller, callerCSteamID, callerCharName, callerSteamName, banData);
+            }
+            else
+            {
+                // Player hasen't been found, check to see if the ban exists in the internal bans, if CSteamID, otherwise fail.
+                if (isCSteamID)
                 {
-                    RemoveBan(caller, callerCSteamID, callerCharName, callerSteamName, banData);
-                }
-                // Player hasen't been found.
-                else
-                {
-                    // Check to see if the ban exists in the in-built bans, and remove if it is, otherwise fail.
                     SteamBlacklistID Out;
                     if (SteamBlacklist.checkBanned(command[0].StringToCSteamID(), out Out))
                     {
@@ -116,17 +114,9 @@ namespace QBan
                         return;
                     }
                 }
-            }
-            else
-            {
-                // Player has been found.
-                if (banData.targetSID != (CSteamID)0)
-                {
-                    RemoveBan(caller, callerCSteamID, callerCharName, callerSteamName, banData);
-                }
-                // Player hasen't been found.
                 else
                 {
+                    // Player hasen't been found.
                     UnturnedChat.Say(caller, String.Format("Error: Could not find player {0} to unban.", command));
                     return;
                 }

@@ -4,7 +4,6 @@ using Rocket.API;
 using Rocket.Core.Logging;
 using Rocket.Core.Plugins;
 using Rocket.Unturned;
-using Rocket.Unturned.Plugins;
 using Rocket.Unturned.Player;
 using SDG.Unturned;
 using Steamworks;
@@ -40,14 +39,7 @@ namespace QBan
         // search by name of a previous player.
         public static PlayersValues GetPlayer(string search)
         {
-            try
-            {
-                return Players.Values.First(contents => contents.playerCharName.ToLower().Contains(search.ToLower()) || contents.playerSteamName.ToLower().Contains(search.ToLower()));
-            }
-            catch
-            {
-                return new PlayersValues();
-            }
+            return Players.Values.FirstOrDefault(contents => contents.playerCharName.ToLower().Contains(search.ToLower()) || contents.playerSteamName.ToLower().Contains(search.ToLower()));
         }
 
         // Exact match to a previous player, by SteamID64 number.
@@ -60,7 +52,7 @@ namespace QBan
             }
             else
             {
-            return new PlayersValues();
+            return null;
             }
         }
 
@@ -88,7 +80,7 @@ namespace QBan
                 BanDataValues check = dataStore.GetQBanData(pair.Key);
                 int timeLeft = (int)(pair.Value.duration - (DateTime.Now - pair.Value.setTime).TotalSeconds);
                 // Don't sync if the time left is negative, and if they aren't still banned.
-                if (timeLeft > 0 && check.targetSID != (CSteamID)0)
+                if (timeLeft > 0 && check != null)
                 {
                     SteamBlacklist.ban(pair.Key, pair.Value.adminSID, pair.Value.reason, (uint)timeLeft);
                     SteamBlacklist.save();
@@ -122,7 +114,7 @@ namespace QBan
 
             //check to see if the player needs to be banned.
             BanDataValues checkBan = dataStore.GetQBanData(player.CSteamID);
-            if (checkBan.targetSID != (CSteamID)0)
+            if (checkBan != null)
             {
                 // Don't try to ban if it has expired.
                 if (checkBan.duration - (DateTime.Now - checkBan.setTime).TotalSeconds <= 0)
