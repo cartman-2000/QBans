@@ -19,10 +19,11 @@ namespace QBan
     {
         public static QBan Instance;
         public DataStore dataStore;
-        private DateTime lastCalledTimer = DateTime.Now;
+        private DateTime lastCalledExpiredTimer = DateTime.Now;
+        private DateTime lastCalledQueueTimer = DateTime.Now;
 
         private static Dictionary<CSteamID, PlayersValues> Players = new Dictionary<CSteamID, PlayersValues>();
-        private static Dictionary<CSteamID, BanDataValues> BanSync = new Dictionary<CSteamID, BanDataValues>();
+        private static Dictionary<CSteamID, BanDataValues> BanQueue = new Dictionary<CSteamID, BanDataValues>();
 
         protected override void Load()
         {
@@ -34,6 +35,7 @@ namespace QBan
         protected override void Unload()
         {
             dataStore.Unload();
+            U.Events.OnPlayerConnected -= Events_OnPlayerConnected;
         }
 
         // search by name of a previous player.
@@ -60,34 +62,48 @@ namespace QBan
         {
             if (this.State == PluginState.Loaded)
             {
-                if ((DateTime.Now - lastCalledTimer).TotalSeconds > 600)
+                if ((DateTime.Now - lastCalledExpiredTimer).TotalSeconds > 600)
                 {
-                    lastCalledTimer = DateTime.Now;
-                    if (Configuration.Instance.EnableInternalSync)
-                    {
-                        QueueBanSync();
-                    }
+                    lastCalledExpiredTimer = DateTime.Now;
                     dataStore.CheckExpiredBanData();
+                }
+                if ((DateTime.Now - lastCalledQueueTimer).TotalSeconds > 5)
+                {
+                    HandleBanQueue();
                 }
             }
         }
 
         // Queue's banned players to the internal bans.
-        private void QueueBanSync()
+        private void HandleBanQueue()
         {
-            foreach (KeyValuePair<CSteamID, BanDataValues> pair in BanSync)
+            try
             {
-                BanDataValues check = dataStore.GetQBanData(pair.Key);
-                int timeLeft = (int)(pair.Value.duration - (DateTime.Now - pair.Value.setTime).TotalSeconds);
-                // Don't sync if the time left is negative, and if they aren't still banned.
-                if (timeLeft > 0 && check != null)
+                foreach (KeyValuePair<CSteamID, BanDataValues> pair in BanQueue)
                 {
-                    SteamBlacklist.ban(pair.Key, pair.Value.adminSID, pair.Value.reason, (uint)timeLeft);
-                    SteamBlacklist.save();
-                    Logger.Log(String.Format("Player {0}[{1}]({2}), has been synced to internal bans.", pair.Value.targetCharName, pair.Value.targetSteamName, pair.Value.targetSID));
+                    BanDataValues check = dataStore.GetQBanData(pair.Key);
+                    int timeLeft = (int)(pair.Value.duration - (DateTime.Now - pair.Value.setTime).TotalSeconds);
+                    // Don't sync/kick if the time left is negative, and if they aren't still banned.
+                    if (timeLeft > 0 && check != null)
+                    {
+                        if (Instance.Configuration.Instance.EnableInternalSync)
+                        {
+                            SteamBlacklist.ban(pair.Key, pair.Value.adminSID, pair.Value.reason, (uint)timeLeft);
+                            SteamBlacklist.save();
+                            Logger.Log(String.Format("Player {0}[{1}]({2}), has been synced to internal bans.", pair.Value.targetCharName, pair.Value.targetSteamName, pair.Value.targetSID));
+                        }
+                        else
+                        {
+                            Steam.kick(pair.Key, pair.Value.reason);
+                        }
+                    }
                 }
+                BanQueue.Clear();
             }
-            BanSync.Clear();
+            catch
+            {
+                // NRE on kick/ban, run on next interval.
+            }
         }
 
         public void Events_OnPlayerConnected(UnturnedPlayer player)
@@ -122,16 +138,6 @@ namespace QBan
                     return;
                 }
 
-                // NRE bug in inventory save on kick on connect, but the kick still goes through, so this error can be ignored.
-                try
-                {
-                    Steam.kick(checkBan.targetSID, checkBan.reason);
-                }
-                catch
-                {
-                    //
-                }
-
                 if (checkBan.targetCharName == "" || checkBan.targetSteamName == "")
                 {
                     checkBan.targetCharName = player.CharacterName;
@@ -140,12 +146,10 @@ namespace QBan
                     dataStore.SetQBanData(player.CSteamID, checkBan);
                 }
 
-                // Have to send the adding to the blacklist to a timed update as it would NRE here, 
-                // SteamBlacklist.ban also calls ban on the player which causes the same NRE as kicking them do here.
-                // Only sync to the internal blacklist if syncing has been enabled in the config file.
-                if (!BanSync.ContainsKey(player.CSteamID) && Configuration.Instance.EnableInternalSync)
+                // Handle the kicking/syncing of the player in the Ban Queue, Kicking a player in OnConnect will NRE.
+                if (!BanQueue.ContainsKey(player.CSteamID))
                 {
-                    BanSync.Add(player.CSteamID, checkBan);
+                    BanQueue.Add(player.CSteamID, checkBan);
                 }
             }
         }
