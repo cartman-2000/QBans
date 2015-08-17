@@ -17,7 +17,7 @@ namespace QBan
             ulong ulCSteamID;
             if (ulong.TryParse(sCSteamID, out ulCSteamID))
             {
-                if ((ulCSteamID >= (ulong)0x0110000100000000 && ulCSteamID <= (ulong)0x0170000000000000) || ulCSteamID == 0)
+                if ((ulCSteamID >= 0x0110000100000000 && ulCSteamID <= 0x0170000000000000) || ulCSteamID == 0)
                 {
                     return (CSteamID)ulCSteamID;
                 }

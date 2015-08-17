@@ -11,8 +11,6 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 
-
-
 namespace QBan
 {
     public class QBan : RocketPlugin<QBanConfiguration>
@@ -49,13 +47,8 @@ namespace QBan
         {
             PlayersValues result;
             if(Players.TryGetValue(search, out result))
-            {
                 return result;
-            }
-            else
-            {
             return null;
-            }
         }
 
         public void FixedUpdate()
@@ -68,9 +61,7 @@ namespace QBan
                     dataStore.CheckExpiredBanData();
                 }
                 if ((DateTime.Now - lastCalledQueueTimer).TotalSeconds > 5)
-                {
                     HandleBanQueue();
-                }
             }
         }
 
@@ -134,9 +125,7 @@ namespace QBan
             {
                 // Don't try to ban if it has expired.
                 if (checkBan.duration - (DateTime.Now - checkBan.setTime).TotalSeconds <= 0)
-                {
                     return;
-                }
 
                 if (checkBan.targetCharName == "" || checkBan.targetSteamName == "")
                 {
@@ -148,9 +137,7 @@ namespace QBan
 
                 // Handle the kicking/syncing of the player in the Ban Queue, Kicking a player in OnConnect will NRE.
                 if (!BanQueue.ContainsKey(player.CSteamID))
-                {
                     BanQueue.Add(player.CSteamID, checkBan);
-                }
             }
         }
     }

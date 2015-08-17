@@ -10,12 +10,8 @@ namespace QBan
 {
     public class DataStore
     {
-        private static string QBansBaseDir = "Plugins/QBans";
         private static string QBansBansFile = "Plugins/QBans/BansData.txt";
-        private static string QBansBansbackupFile = "Plugins/QBans/BansData_bk.txt";
         private static string QBansBansExpiredExportFile = "Plugins/QBans/BansData_Expired.txt";
-        private static string QBansBansFileHeader = "## Data file for the queued bans, format: target_sid><target_charname><target_steamname><admin_sid><admin_charname><admin_steamname><reason><duration><set_time";
-
         private static Dictionary<CSteamID, BanDataValues> QBanData = new Dictionary<CSteamID, BanDataValues>();
 
         public DataStore()
@@ -26,29 +22,42 @@ namespace QBan
         // Initialize/load the ban data here.
         private static void Initialize()
         {
-            //create an empty file for the bans.
-            if (!File.Exists(QBansBansFile))
+            // Check to see if we need to import data from the legacy data files.
+            if (File.Exists(QBansBansExpiredExportFile) && QBan.Instance.Configuration.Instance.ExpiredBans.Count == 0)
+                Legacy(QBansBansExpiredExportFile);
+            if (File.Exists(QBansBansFile) && QBan.Instance.Configuration.Instance.Bans.Count == 0)
+                Legacy(QBansBansFile);
+            else
             {
-                SaveToFile();
+                foreach (BanDataValues banData in QBan.Instance.Configuration.Instance.Bans)
+                {
+                    try
+                    {
+                        QBanData.Add(banData.targetSID, banData);
+                    }
+                    catch
+                    {
+                        Logger.LogWarning("Error: Duplicate record in the config file.");
+                    }
+                }
             }
+        }
 
-            string[] lines = File.ReadAllLines(@QBansBansFile);
-            int i = 1;
+        private static void Legacy(string file)
+        {
+            string[] lines = File.ReadAllLines(file);
+            int i = 0;
             foreach (string value in lines)
             {
+                i++;
                 if (value != "" && !value.StartsWith("##"))
                 {
-                    i++;
                     //use new style string splitting delimiter or old one based on what it matches.
                     String[] componentsFromSerial;
                     if (value.Contains("><"))
-                    {
                         componentsFromSerial = value.Split(new String[] { "><" }, StringSplitOptions.None);
-                    }
                     else
-                    {
                         componentsFromSerial = value.Split(new char[] { '/' }, StringSplitOptions.None);
-                    }
 
                     if (componentsFromSerial.Length == 9)
                     {
@@ -72,7 +81,10 @@ namespace QBan
                             BanDataValue.duration = banDuration;
                             BanDataValue.setTime = DateTime.FromBinary(banTime);
 
-                            QBanData.Add(componentsFromSerial[0].StringToCSteamID(), BanDataValue);
+                            if (file == QBansBansFile)
+                                QBanData.Add(componentsFromSerial[0].StringToCSteamID(), BanDataValue);
+                            else
+                                QBan.Instance.Configuration.Instance.ExpiredBans.Add(BanDataValue);
                         }
                         catch
                         {
@@ -85,6 +97,7 @@ namespace QBan
                     }
                 }
             }
+            SaveToFile();
         }
 
         public void Unload()
@@ -98,9 +111,7 @@ namespace QBan
             try
             {
                 if (QBanData.ContainsKey(key))
-                {
                     QBanData.Remove(key);
-                }
 
                 QBanData.Add(key, data);
                 SaveToFile();
@@ -132,17 +143,12 @@ namespace QBan
         }
 
         // Get exact match by CSteamID.
-        public BanDataValues GetQBanData(Steamworks.CSteamID cSteamID)
+        public BanDataValues GetQBanData(CSteamID cSteamID)
         {
             BanDataValues result;
             if (QBanData.TryGetValue(cSteamID, out result))
-            {
                 return result;
-            }
-            else
-            {
-                return null;
-            }
+            return null;
         }
 
         // Grab a list of bans for the bans command.
@@ -151,13 +157,10 @@ namespace QBan
             // Grab a list of matches of the searchString out of the QBanData dictionary.
             List<BanDataValues> matches = new List<BanDataValues>();
             if (searchString == String.Empty)
-            {
                 matches = QBanData.Values.OrderBy(o => o.setTime).ToList();
-            }
             else
-            {
                 matches = QBanData.Values.Where(contents => contents.targetCharName.ToLower().Contains(searchString.ToLower()) || contents.targetSteamName.ToLower().Contains(searchString.ToLower())).OrderBy(o => o.setTime).ToList();
-            }
+
             int matchCount = matches.Count;
             int index;
             int numbeOfRecords;
@@ -168,9 +171,7 @@ namespace QBan
                 index = 0;
                 numbeOfRecords = matchCount - count * (pagination - 1);
                 if (numbeOfRecords < 0)
-                {
                     numbeOfRecords = 0;
-                }
             }
             else
             {
@@ -190,15 +191,8 @@ namespace QBan
                 Logger.Log(String.Format("Ban for player: {0}[{1}]({2}), has expired.",banData.targetCharName, banData.targetSteamName, banData.targetSID));
                 QBanData.Remove(banData.targetSID);
                 SteamBlacklist.unban(banData.targetSID);
-            }
-            if (QBan.Instance.Configuration.Instance.EnableExpiredExport && expiredList.Count != 0)
-            {
-                StreamWriter file = new StreamWriter(QBansBansExpiredExportFile, true);
-                foreach (BanDataValues banData in expiredList)
-                {
-                    WriteLine(file, banData);
-                }
-                file.Close();
+                if (QBan.Instance.Configuration.Instance.EnableExpiredExport && expiredList.Count != 0)
+                    QBan.Instance.Configuration.Instance.ExpiredBans.Add(banData);
             }
             if (expiredList.Count != 0)
             {
@@ -210,33 +204,9 @@ namespace QBan
         // Save to file.
         private static void SaveToFile()
         {
-            //Create the folder where the data file is to be stored
-            Directory.CreateDirectory(QBansBaseDir);
-            //create a backup of the main data file before writing to it.
-            if (File.Exists(QBansBansFile))
-            {
-                File.Copy(QBansBansFile, QBansBansbackupFile, true);
-            }
-            // Iterate through the dictionary and parse the entries out to file.
-            StreamWriter file = new StreamWriter(QBansBansFile, false);
-            file.WriteLine(QBansBansFileHeader);
-            foreach (KeyValuePair<CSteamID, BanDataValues> pair in QBanData)
-            {
-                WriteLine(file, pair.Value);
-            }
-            file.Close();
-        }
-
-        private static void WriteLine(StreamWriter file, BanDataValues data)
-        {
-            try
-            {
-                file.WriteLine(data.targetSID.ToString() + "><" + data.targetCharName + "><" + data.targetSteamName + "><" + data.adminSID.ToString() + "><" + data.adminCharName + "><" + data.adminSteamName + "><" + data.reason + "><" + data.duration.ToString() + "><" + data.setTime.ToBinary().ToString());
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            // Dump the data in the QBanData dictionary to the configuration and save.
+            QBan.Instance.Configuration.Instance.Bans = QBanData.Values.ToList();
+            QBan.Instance.Configuration.Save(QBan.Instance.Configuration.Instance);
         }
     }
 }
