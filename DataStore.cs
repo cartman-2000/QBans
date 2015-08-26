@@ -206,7 +206,7 @@ namespace QBan
         {
             // Dump the data in the QBanData dictionary to the configuration and save.
             QBan.Instance.Configuration.Instance.Bans = QBanData.Values.ToList();
-            QBan.Instance.Configuration.Save(QBan.Instance.Configuration.Instance);
+            QBan.Instance.Configuration.Save();
         }
     }
 }
