@@ -85,7 +85,7 @@ namespace QBan
                         }
                         else
                         {
-                            Steam.kick(pair.Key, pair.Value.reason);
+                            Provider.kick(pair.Key, pair.Value.reason);
                         }
                     }
                 }
