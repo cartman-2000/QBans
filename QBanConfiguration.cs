@@ -9,6 +9,7 @@ namespace QBan
         public bool EnableInternalSync;
         public bool EnableExpiredExport;
         public bool ReasonManditory;
+        public uint KickGracePeriod;
         [XmlArray("Bans"), XmlArrayItem(ElementName = "Ban")]
         public List<BanDataValues> Bans;
         [XmlArray("ExpiredBans"), XmlArrayItem(ElementName = "ExpiredBan")]
@@ -18,6 +19,7 @@ namespace QBan
             EnableInternalSync = true;
             EnableExpiredExport = true;
             ReasonManditory = true;
+            KickGracePeriod = 6;
             Bans = new List<BanDataValues>();
             ExpiredBans = new List<BanDataValues>();
         }

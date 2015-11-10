@@ -54,7 +54,7 @@ namespace QBan
             long banDuration = 1000000000;
             long maxDuration = banDuration;
             string banReason = "Banned";
-            string playerName = command[0].Replace("><", "");
+            string playerName = command[0].Trim();
 
             if (command.Length > 4)
             {
@@ -65,19 +65,19 @@ namespace QBan
             // Fail on invalid steam id or missing playername. And set the reason for the ban, if one is set.
             if (command.Length >= 1)
             {
-                if (playerName.Trim() == String.Empty || playerName.Trim() == "0")
+                if (playerName == String.Empty || playerName == "0")
                 {
                     UnturnedChat.Say(caller, "Error: Invalid player name in ban command.");
                     return;
                 }
-                if ((command.GetStringParameter(1) != null ? command.GetStringParameter(1) : "").Replace("><", "").Trim() == String.Empty && QBan.Instance.Configuration.Instance.ReasonManditory)
+                if ((command.GetStringParameter(1) != null ? command.GetStringParameter(1) : "").Sanitze().Trim() == String.Empty && QBan.Instance.Configuration.Instance.ReasonManditory)
                 {
-                    UnturnedChat.Say(caller, "Error: Reason is manditory on ban command.");
+                    UnturnedChat.Say(caller, "Error: Reason is mandatory on ban command.");
                     return;
                 }
                 else if (command.Length >= 2)
                 {
-                    banReason = command.GetStringParameter(1).Replace("><", "").Trim();
+                    banReason = command.GetStringParameter(1).Sanitze().Trim();
                 }
             }
 
@@ -138,8 +138,8 @@ namespace QBan
             {
                 UnturnedPlayer unturnedCaller = (UnturnedPlayer)caller;
                 callerCSteamID = unturnedCaller.CSteamID;
-                callerCharName = unturnedCaller.CharacterName.Replace("><", "");
-                callerSteamName = unturnedCaller.SteamName.Replace("><", "");
+                callerCharName = unturnedCaller.CharacterName.Sanitze();
+                callerSteamName = unturnedCaller.SteamName.Sanitze();
             }
 
             // Is what is entered in the command a SteamID64 number. Also set the variable to check to see if the player has played on the server since it's start.
@@ -170,8 +170,8 @@ namespace QBan
             {
                 // player is online, handle them normally.
                 data.targetSID = target.CSteamID;
-                data.targetCharName = target.CharacterName.Replace("><", "");
-                data.targetSteamName = target.SteamName.Replace("><", "");
+                data.targetCharName = target.CharacterName.Sanitze();
+                data.targetSteamName = target.SteamName.Sanitze();
                 SetBan(caller, data);
             }
             else
@@ -181,8 +181,8 @@ namespace QBan
                 if (getPlayer != null)
                 {
                     data.targetSID = getPlayer.playerSID;
-                    data.targetCharName = getPlayer.playerCharName.Replace("><", "");
-                    data.targetSteamName = getPlayer.playerSteamName.Replace("><", "");
+                    data.targetCharName = getPlayer.playerCharName.Sanitze();
+                    data.targetSteamName = getPlayer.playerSteamName.Sanitze();
                     SetBan(caller, data);
                 }
                 // Didn't get a hit on the player info, They haven't played on the server since last start. Continue if a SteamID64 number was entered in the command.

@@ -21,13 +21,16 @@ namespace QBan
         private DateTime lastCalledQueueTimer = DateTime.Now;
 
         private static Dictionary<CSteamID, PlayersValues> Players = new Dictionary<CSteamID, PlayersValues>();
-        private static Dictionary<CSteamID, BanDataValues> BanQueue = new Dictionary<CSteamID, BanDataValues>();
 
         protected override void Load()
         {
             Instance = this;
             dataStore = new DataStore();
             U.Events.OnPlayerConnected += Events_OnPlayerConnected;
+            // Set defaults on new config.
+            if (Instance.Configuration.Instance.KickGracePeriod == 0)
+                Instance.Configuration.Instance.KickGracePeriod = 6;
+            Instance.Configuration.Save();
         }
 
         protected override void Unload()
@@ -60,51 +63,24 @@ namespace QBan
                     lastCalledExpiredTimer = DateTime.Now;
                     dataStore.CheckExpiredBanData();
                 }
-                if ((DateTime.Now - lastCalledQueueTimer).TotalSeconds > 5)
-                    HandleBanQueue();
             }
         }
 
-        // Queue's banned players to the internal bans.
-        private void HandleBanQueue()
+        private void Events_OnPlayerConnected(UnturnedPlayer player)
         {
-            try
-            {
-                foreach (KeyValuePair<CSteamID, BanDataValues> pair in BanQueue)
-                {
-                    BanDataValues check = dataStore.GetQBanData(pair.Key);
-                    int timeLeft = (int)(pair.Value.duration - (DateTime.Now - pair.Value.setTime).TotalSeconds);
-                    // Don't sync/kick if the time left is negative, and if they aren't still banned.
-                    if (timeLeft > 0 && check != null)
-                    {
-                        if (Instance.Configuration.Instance.EnableInternalSync)
-                        {
-                            SteamBlacklist.ban(pair.Key, pair.Value.adminSID, pair.Value.reason, (uint)timeLeft);
-                            SteamBlacklist.save();
-                            Logger.Log(String.Format("Player {0}[{1}]({2}), has been synced to internal bans.", pair.Value.targetCharName, pair.Value.targetSteamName, pair.Value.targetSID));
-                        }
-                        else
-                        {
-                            Provider.kick(pair.Key, pair.Value.reason);
-                        }
-                    }
-                }
-                BanQueue.Clear();
-            }
-            catch
-            {
-                // NRE on kick/ban, run on next interval.
-            }
-        }
+            // Grab the players ip address, for use in ip banning.
+            P2PSessionState_t sessionState;
+            SteamGameServerNetworking.GetP2PSessionState(player.CSteamID, out sessionState);
+            uint uIP = sessionState.m_nRemoteIP;
+            Logger.Log(player.CharacterName + " [" + player.SteamName + "] IP: " + Parser.getIPFromUInt32(uIP));
 
-        public void Events_OnPlayerConnected(UnturnedPlayer player)
-        {
             if (!Players.ContainsKey(player.CSteamID))
             {
                 PlayersValues playerData = new PlayersValues();
                 playerData.playerSID = player.CSteamID;
                 playerData.playerCharName = player.CharacterName;
                 playerData.playerSteamName = player.SteamName;
+                playerData.playerUintIP = uIP;
                 Players.Add(player.CSteamID, playerData);
             }
             else
@@ -112,10 +88,11 @@ namespace QBan
                 // update the stored player name if it doesn't match what they are currently using.
                 PlayersValues playerData;
                 Players.TryGetValue(player.CSteamID, out playerData);
-                if (playerData.playerCharName != player.CharacterName || playerData.playerSteamName != player.SteamName)
+                if (playerData.playerCharName != player.CharacterName || playerData.playerSteamName != player.SteamName || playerData.playerUintIP != uIP)
                 {
                     playerData.playerCharName = player.CharacterName;
                     playerData.playerSteamName = player.SteamName;
+                    playerData.playerUintIP = uIP;
                 }
             }
 
@@ -129,15 +106,19 @@ namespace QBan
 
                 if (checkBan.targetCharName == "" || checkBan.targetSteamName == "")
                 {
-                    checkBan.targetCharName = player.CharacterName;
-                    checkBan.targetSteamName = player.SteamName;
+                    checkBan.targetCharName = player.CharacterName.Sanitze();
+                    checkBan.targetSteamName = player.SteamName.Sanitze();
                     // Update player info on ban.
                     dataStore.SetQBanData(player.CSteamID, checkBan);
                 }
 
                 // Handle the kicking/syncing of the player in the Ban Queue, Kicking a player in OnConnect will NRE.
-                if (!BanQueue.ContainsKey(player.CSteamID))
-                    BanQueue.Add(player.CSteamID, checkBan);
+
+
+                QBanPlayer qbanplayer = player.GetComponent<QBanPlayer>();
+                qbanplayer.SetKick(player, checkBan);
+//                if (!BanQueue.ContainsKey(player.CSteamID))
+//                    BanQueue.Add(player.CSteamID, checkBan);
             }
         }
     }

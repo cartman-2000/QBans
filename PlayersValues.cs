@@ -12,5 +12,6 @@ namespace QBan
         public CSteamID playerSID  { get; set; }
         public string playerCharName  { get; set; }
         public string playerSteamName  { get; set; }
+        public uint playerUintIP { get; set; }
     }
 }

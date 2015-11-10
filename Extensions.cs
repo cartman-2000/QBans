@@ -1,5 +1,6 @@
 ﻿using Steamworks;
 using System;
+using System.Text.RegularExpressions;
 
 namespace QBan
 {
@@ -24,6 +25,14 @@ namespace QBan
                 throw new FormatException(String.Format("Unable to convert {0} to a CSteamID, not in the valid range.", sCSteamID));
             }
             throw new FormatException(String.Format("Unable to convert {0} to a CSteamID, not a valid unsigned number.", sCSteamID));
+        }
+
+        // Sanitize strings with binary control characters 0x00-0x1f.
+        public static string Sanitze(this string value)
+        {
+            if (value == null)
+                return null;
+            return Regex.Replace(value, @"([\u0000-\u001F])+", " ");
         }
     }
 }

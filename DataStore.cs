@@ -10,8 +10,6 @@ namespace QBan
 {
     public class DataStore
     {
-        private static string QBansBansFile = "Plugins/QBans/BansData.txt";
-        private static string QBansBansExpiredExportFile = "Plugins/QBans/BansData_Expired.txt";
         private static Dictionary<CSteamID, BanDataValues> QBanData = new Dictionary<CSteamID, BanDataValues>();
 
         public DataStore()
@@ -22,82 +20,40 @@ namespace QBan
         // Initialize/load the ban data here.
         private static void Initialize()
         {
-            // Check to see if we need to import data from the legacy data files.
-            if (File.Exists(QBansBansExpiredExportFile) && QBan.Instance.Configuration.Instance.ExpiredBans.Count == 0)
-                Legacy(QBansBansExpiredExportFile);
-            if (File.Exists(QBansBansFile) && QBan.Instance.Configuration.Instance.Bans.Count == 0)
-                Legacy(QBansBansFile);
-            else
+            DateTime unsetDateTime = new DateTime(0);
+            foreach (BanDataValues banData in QBan.Instance.Configuration.Instance.Bans)
             {
-                foreach (BanDataValues banData in QBan.Instance.Configuration.Instance.Bans)
+                try
                 {
-                    try
+                    // Sanity checks for loaded data.
+                    if (banData.targetCharName == null)
+                        banData.targetCharName = "";
+                    if (banData.targetSteamName == null)
+                        banData.targetSteamName = "";
+                    if (banData.adminCharName == null)
+                        banData.adminCharName = "";
+                    if (banData.adminSteamName == null)
+                        banData.adminSteamName = "";
+                    if (banData.reason == null)
+                        banData.reason = "Banned.";
+                    if (banData.targetSID == (CSteamID)0)
                     {
-                        QBanData.Add(banData.targetSID, banData);
+                        Logger.LogWarning("Loading: Bad target Steam ID in record, skipping.");
+                        continue;
                     }
-                    catch
+                    if (banData.setTime == unsetDateTime)
                     {
-                        Logger.LogWarning("Error: Duplicate record in the config file.");
+                        Logger.LogWarning("Loading: Bad set time in record, skipping.");
+                        continue;
                     }
+                    // Now add the record to the dictionary.
+                    QBanData.Add(banData.targetSID, banData);
+                }
+                catch
+                {
+                    Logger.LogWarning("Error: Duplicate record in the config file.");
                 }
             }
-        }
-
-        private static void Legacy(string file)
-        {
-            string[] lines = File.ReadAllLines(file);
-            int i = 0;
-            foreach (string value in lines)
-            {
-                i++;
-                if (value != "" && !value.StartsWith("##"))
-                {
-                    //use new style string splitting delimiter or old one based on what it matches.
-                    String[] componentsFromSerial;
-                    if (value.Contains("><"))
-                        componentsFromSerial = value.Split(new String[] { "><" }, StringSplitOptions.None);
-                    else
-                        componentsFromSerial = value.Split(new char[] { '/' }, StringSplitOptions.None);
-
-                    if (componentsFromSerial.Length == 9)
-                    {
-                        try
-                        {
-                            uint banDuration;
-                            long banTime;
-                            uint.TryParse(componentsFromSerial[7], out banDuration);
-                            long.TryParse(componentsFromSerial[8], out banTime);
-
-                            BanDataValues BanDataValue = new BanDataValues();
-                            BanDataValue.targetSID = componentsFromSerial[0].StringToCSteamID();
-                            BanDataValue.targetCharName = componentsFromSerial[1];
-                            BanDataValue.targetSteamName = componentsFromSerial[2];
-
-                            BanDataValue.adminSID = componentsFromSerial[3].StringToCSteamID();
-                            BanDataValue.adminCharName = componentsFromSerial[4];
-                            BanDataValue.adminSteamName = componentsFromSerial[5];
-
-                            BanDataValue.reason = componentsFromSerial[6];
-                            BanDataValue.duration = banDuration;
-                            BanDataValue.setTime = DateTime.FromBinary(banTime);
-
-                            if (file == QBansBansFile)
-                                QBanData.Add(componentsFromSerial[0].StringToCSteamID(), BanDataValue);
-                            else
-                                QBan.Instance.Configuration.Instance.ExpiredBans.Add(BanDataValue);
-                        }
-                        catch
-                        {
-                            Logger.LogWarning(String.Format("Error in parsing ban record entry, line: {0} of {1}.", i, lines.Count()));
-                        }
-                    }
-                    else
-                    {
-                        Logger.LogWarning(String.Format("Failed to load an entry out of the bans data file, wrong number of values, number of values returned {0} of 9.", componentsFromSerial.Length));
-                    }
-                }
-            }
-            SaveToFile();
         }
 
         public void Unload()
