@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace QBan
 {
-    class CommandQBans : IRocketCommand
+    public class CommandQBans : IRocketCommand
     {
         public bool AllowFromConsole
         {

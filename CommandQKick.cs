@@ -8,7 +8,7 @@ using Rocket.Unturned.Player;
 
 namespace QBan
 {
-    class CommandQKick : IRocketCommand
+    public class CommandQKick : IRocketCommand
     {
         public bool AllowFromConsole
         {
