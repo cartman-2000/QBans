@@ -11,18 +11,20 @@ namespace QBan
         private DateTime startTime;
         private UnturnedPlayer pData;
         private BanDataValues bData;
+        private bool ipB;
 
         protected override void Load()
         {
             kickPlayer = false;
         }
 
-        internal void SetKick(UnturnedPlayer player, BanDataValues banData)
+        internal void SetKick(UnturnedPlayer player, BanDataValues banData, bool ipBan)
         {
             startTime = DateTime.Now;
             kickPlayer = true;
             pData = player;
             bData = banData;
+            ipB = ipBan;
         }
 
         public void FixedUpdate()
@@ -36,19 +38,19 @@ namespace QBan
                         ping = 1;
                     if ((DateTime.Now - startTime).TotalSeconds >= QBan.Instance.Configuration.Instance.KickGracePeriod + (pData.Ping * 10))
                     {
-                        int timeLeft = (int)(bData.duration - (DateTime.Now - bData.setTime).TotalSeconds);
+                        uint timeLeft = (uint)(bData.duration - (DateTime.Now - bData.setTime).TotalSeconds);
                         // Don't sync/kick if the time left is negative.
                         if (timeLeft > 0)
                         {
-                            if (QBan.Instance.Configuration.Instance.EnableInternalSync)
+                            if ((QBan.Instance.Configuration.Instance.EnableInternalSync && !ipB) || (QBan.Instance.Configuration.Instance.EnableInternalSync && QBan.Instance.Configuration.Instance.IPBanAutoAdd && ipB))
                             {
-                                SteamBlacklist.ban(bData.targetSID, bData.adminSID, bData.reason, (uint)timeLeft);
+                                SteamBlacklist.ban(bData.targetSID, bData.adminSID, bData.reason, timeLeft);
                                 SteamBlacklist.save();
-                                Logger.Log(String.Format("Player {0}[{1}]({2}), has been synced to internal bans.", bData.targetCharName, bData.targetSteamName, bData.targetSID));
+                                Logger.Log(String.Format("Player {0}[{1}]({2}), has been synced to internal bans, From IP Ban: {3}.", bData.targetCharName, bData.targetSteamName, bData.targetSID.ToString(), ipB.ToString()));
                             }
                             else
                             {
-                                Provider.kick(bData.targetSID, bData.reason);
+                                Provider.kick(bData.targetSID, string.Format("Banned for: {0}, Time left: {1}", bData.reason, timeLeft));
                             }
                         }
                         kickPlayer = false;

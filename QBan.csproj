@@ -70,6 +70,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="QBanCommandCommon.cs" />
     <Compile Include="QBanConfiguration.cs" />
     <Compile Include="PlayersValues.cs" />
     <Compile Include="BanDataValues.cs" />
@@ -82,6 +83,7 @@
     <Compile Include="QBan.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QBanPlayer.cs" />
+    <Compile Include="CommandQIBan.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

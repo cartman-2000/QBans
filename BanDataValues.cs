@@ -6,10 +6,7 @@ namespace QBan
 {
     public class BanDataValues
     {
-        public BanDataValues()
-        {
-
-        }
+        public BanDataValues() { }
 
         [XmlIgnore]
         public CSteamID targetSID { get; set; }
@@ -55,6 +52,12 @@ namespace QBan
         public string reason { get; set; }
         [XmlAttribute("Length")]
         public uint duration { get; set; }
+
+        [XmlAttribute("IPB")]
+        public bool isIPBan { get; set; }
+        [XmlAttribute("UIIP")]
+        public uint uIP { get; set; }
+
         [XmlAttribute("SetT")]
         public DateTime setTime { get; set; }
     }

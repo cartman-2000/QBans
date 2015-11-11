@@ -40,7 +40,7 @@ namespace QBan
             get { return new List<string>() { "qban.kick" }; }
         }
 
-        public void Execute(IRocketPlayer caller, params string[] command)
+        public void Execute(IRocketPlayer caller, string[] command)
         {
             if(command.Length == 0)
             {

@@ -41,7 +41,7 @@ namespace QBan
             get { return new List<string>() { "qban.unban" }; }
         }
 
-        public void Execute(IRocketPlayer caller, params string[] command)
+        public void Execute(IRocketPlayer caller, string[] command)
         {
             if (command.Length == 0)
             {
@@ -58,7 +58,7 @@ namespace QBan
             // Fail on invalid steam id or missing playername.
             if (command[0].Trim() == String.Empty || command[0].Trim() == "0")
             {
-                UnturnedChat.Say(caller, String.Format("Error: Could not find player by ID {0} to unban.", command));
+                UnturnedChat.Say(caller, String.Format("Error: Could not find player by ID {0} to unban.", command[0]));
                 return;
             }
 
@@ -105,19 +105,22 @@ namespace QBan
                     SteamBlacklistID Out;
                     if (SteamBlacklist.checkBanned(command[0].StringToCSteamID(), out Out))
                     {
+                        banData = new BanDataValues();
                         banData.targetSID = command[0].StringToCSteamID();
+                        banData.targetCharName = "";
+                        banData.targetSteamName = "";
                         RemoveBan(caller, callerCSteamID, callerCharName, callerSteamName, banData);
                     }
                     else
                     {
-                        UnturnedChat.Say(caller, String.Format("Error: Could not find player by ID {0} to unban.", command));
+                        UnturnedChat.Say(caller, String.Format("Error: Could not find player by ID {0} to unban.", command[0]));
                         return;
                     }
                 }
                 else
                 {
                     // Player hasen't been found.
-                    UnturnedChat.Say(caller, String.Format("Error: Could not find player {0} to unban.", command));
+                    UnturnedChat.Say(caller, String.Format("Error: Could not find player {0} to unban.", command[0]));
                     return;
                 }
             }

@@ -2,6 +2,7 @@
 using Rocket.Core.Logging;
 using Rocket.Unturned.Chat;
 using Rocket.Unturned.Commands;
+using SDG.Unturned;
 using System;
 using System.Collections.Generic;
 
@@ -39,7 +40,7 @@ namespace QBan
             get { return new List<string>() { "qban.bans" }; }
         }
 
-        public void Execute(IRocketPlayer caller, params string[] command)
+        public void Execute(IRocketPlayer caller, string[] command)
         {
             if (command.Length > 2)
             {
@@ -124,12 +125,12 @@ namespace QBan
                     if (caller is ConsolePlayer)
                     {
                         Logger.Log(String.Format("{0}. {1} [{2}] ({3}), by {4} [{5}]", lineNumbers, (value.targetCharName.Length == 0 ? "Not set" : value.targetCharName), (value.targetSteamName.Length == 0 ? "Not set" : value.targetSteamName), value.targetSID.ToString(), value.adminCharName, value.adminSteamName));
-                        Logger.Log(String.Format("Set: {0:M/d/yy HH:mm}, Till: {1:M/d/yy}, Left: {2}, Reason: {3}", value.setTime, value.setTime.AddSeconds(value.duration), timeLeftFormat, value.reason));
+                        Logger.Log(String.Format("{0:M/d/yy HH:mm}|{1:M/d/yy}|{2}, {3}|{4}, Reason: {5}", value.setTime, value.setTime.AddSeconds(value.duration), timeLeftFormat, value.isIPBan.ToString(), (value.uIP == 0 ? "Not set" : Parser.getIPFromUInt32(value.uIP)), value.reason));
                     }
                     else
                     {
                         UnturnedChat.Say(caller, String.Format("{0}. {1} [{2}] ({3}), by {4} [{5}]", lineNumbers, (value.targetCharName.Length == 0 ? "Not set" : value.targetCharName.Truncate(14)), (value.targetSteamName.Length == 0 ? "Not set" : value.targetSteamName.Truncate(14)), value.targetSID.ToString(), value.adminCharName.Truncate(12), value.adminSteamName.Truncate(12)));
-                        UnturnedChat.Say(caller, String.Format("Set: {0:M/d/yy HH:mm}, Till: {1:M/d/yy}, Left: {2}, Reason: {3}", value.setTime, value.setTime.AddSeconds(value.duration), timeLeftFormat, value.reason));
+                        UnturnedChat.Say(caller, String.Format("{0:M/d/yy HH:mm}|{1:M/d/yy}|{2}, {3}|{4}, Reason: {5}", value.setTime, value.setTime.AddSeconds(value.duration), timeLeftFormat, value.isIPBan.ToString(), (value.uIP == 0 ? "Not set" : Parser.getIPFromUInt32(value.uIP)), value.reason));
                     }
                     lineNumbers++;
                 }

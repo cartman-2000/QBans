@@ -107,6 +107,12 @@ namespace QBan
             return null;
         }
 
+        // Search for IP bans by CSteamID.
+        public BanDataValues GetIPQBanData(uint ip)
+        {
+            return QBanData.Values.FirstOrDefault(contents => contents.uIP == ip && contents.isIPBan);
+        }
+
         // Grab a list of bans for the bans command.
         public KeyValuePair<int, List<BanDataValues>> GetQBanDataList(string searchString, int count, int pagination)
         {

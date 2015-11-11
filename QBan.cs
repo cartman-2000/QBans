@@ -27,9 +27,7 @@ namespace QBan
             Instance = this;
             dataStore = new DataStore();
             U.Events.OnPlayerConnected += Events_OnPlayerConnected;
-            // Set defaults on new config.
-            if (Instance.Configuration.Instance.KickGracePeriod == 0)
-                Instance.Configuration.Instance.KickGracePeriod = 6;
+            // Save defaults for new config options.
             Instance.Configuration.Save();
         }
 
@@ -80,7 +78,7 @@ namespace QBan
                 playerData.playerSID = player.CSteamID;
                 playerData.playerCharName = player.CharacterName;
                 playerData.playerSteamName = player.SteamName;
-                playerData.playerUintIP = uIP;
+                playerData.playerUIP = uIP;
                 Players.Add(player.CSteamID, playerData);
             }
             else
@@ -88,37 +86,64 @@ namespace QBan
                 // update the stored player name if it doesn't match what they are currently using.
                 PlayersValues playerData;
                 Players.TryGetValue(player.CSteamID, out playerData);
-                if (playerData.playerCharName != player.CharacterName || playerData.playerSteamName != player.SteamName || playerData.playerUintIP != uIP)
+                if (playerData.playerCharName != player.CharacterName || playerData.playerSteamName != player.SteamName || playerData.playerUIP != uIP)
                 {
                     playerData.playerCharName = player.CharacterName;
                     playerData.playerSteamName = player.SteamName;
-                    playerData.playerUintIP = uIP;
+                    playerData.playerUIP = uIP;
                 }
             }
 
             //check to see if the player needs to be banned.
             BanDataValues checkBan = dataStore.GetQBanData(player.CSteamID);
+            bool ipBanMatch = false;
+            if (checkBan == null)
+            {
+                checkBan = dataStore.GetIPQBanData(uIP);
+                if(checkBan != null)
+                    ipBanMatch = true;
+            }
             if (checkBan != null)
             {
                 // Don't try to ban if it has expired.
                 if (checkBan.duration - (DateTime.Now - checkBan.setTime).TotalSeconds <= 0)
                     return;
 
-                if (checkBan.targetCharName == "" || checkBan.targetSteamName == "")
+                if (ipBanMatch)
+                {
+                    Logger.Log(string.Format("IP ban: IP match on this player, Matches player: {0}[{1}]({2}), kicking!", checkBan.targetCharName, checkBan.targetSteamName, checkBan.targetSID));
+                }
+
+                if ((checkBan.targetCharName == "" || checkBan.targetSteamName == "" || checkBan.uIP != uIP) && !ipBanMatch)
                 {
                     checkBan.targetCharName = player.CharacterName.Sanitze();
                     checkBan.targetSteamName = player.SteamName.Sanitze();
+                    checkBan.uIP = uIP;
                     // Update player info on ban.
                     dataStore.SetQBanData(player.CSteamID, checkBan);
                 }
+                else
+                {
+                    BanDataValues temp = checkBan;
+                    checkBan = new BanDataValues();
+                    checkBan.targetSID = player.CSteamID;
+                    checkBan.targetCharName = player.CharacterName;
+                    checkBan.targetSteamName = player.SteamName;
+                    checkBan.adminSID = temp.adminSID;
+                    checkBan.adminCharName = temp.adminCharName;
+                    checkBan.adminSteamName = temp.adminSteamName;
+                    checkBan.reason = temp.reason;
+                    checkBan.duration = temp.duration;
+                    checkBan.isIPBan = false;
+                    checkBan.uIP = temp.uIP;
+                    checkBan.setTime = temp.setTime;
+                    if (Instance.Configuration.Instance.IPBanAutoAdd)
+                        dataStore.SetQBanData(player.CSteamID, checkBan);
+                }
 
-                // Handle the kicking/syncing of the player in the Ban Queue, Kicking a player in OnConnect will NRE.
-
-
+                // Send the player over to the player component to handle the kicking and syncing of ban data.
                 QBanPlayer qbanplayer = player.GetComponent<QBanPlayer>();
-                qbanplayer.SetKick(player, checkBan);
-//                if (!BanQueue.ContainsKey(player.CSteamID))
-//                    BanQueue.Add(player.CSteamID, checkBan);
+                qbanplayer.SetKick(player, checkBan, ipBanMatch);
             }
         }
     }
