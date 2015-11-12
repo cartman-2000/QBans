@@ -70,7 +70,8 @@ namespace QBan
             P2PSessionState_t sessionState;
             SteamGameServerNetworking.GetP2PSessionState(player.CSteamID, out sessionState);
             uint uIP = sessionState.m_nRemoteIP;
-            Logger.Log(player.CharacterName + " [" + player.SteamName + "] IP: " + Parser.getIPFromUInt32(uIP));
+            string sIP = Parser.getIPFromUInt32(uIP);
+            Logger.Log(player.CharacterName + " [" + player.SteamName + "] IP: " + sIP);
 
             if (!Players.ContainsKey(player.CSteamID))
             {
@@ -111,7 +112,7 @@ namespace QBan
 
                 if (ipBanMatch)
                 {
-                    Logger.Log(string.Format("IP ban: IP match on this player, Matches player: {0}[{1}]({2}), kicking!", checkBan.targetCharName, checkBan.targetSteamName, checkBan.targetSID));
+                    Logger.Log(string.Format("IP ban: IP match on this player, Matches player: {0}[{1}]({2}) IP: {3}, kicking!", checkBan.targetCharName, checkBan.targetSteamName, checkBan.targetSID, sIP));
                 }
 
                 if ((checkBan.targetCharName == "" || checkBan.targetSteamName == "" || checkBan.uIP != uIP) && !ipBanMatch)

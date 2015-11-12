@@ -211,7 +211,7 @@ namespace QBan
 
                 UnturnedChat.Say(caller, String.Format("Player {0}[{1}], has been banned for {2} seconds, IP Ban: {3}.", data.targetCharName.Truncate(12), data.targetSteamName.Truncate(12), data.duration.ToString(), data.isIPBan.ToString()));
                 UnturnedChat.Say(caller, String.Format("Reason: {0}", data.reason));
-                Logger.Log(String.Format("Admin {0}[{1}]({2}), has banned player {3}[{4}]({5}) for {6}, for {7} seconds, IP Ban: {8}.", data.adminCharName, data.adminSteamName, data.adminSID.ToString(), data.targetCharName, data.targetSteamName, data.targetSID.ToString(), data.reason, data.duration.ToString(), data.isIPBan.ToString()));
+                Logger.Log(String.Format("Admin {0}[{1}]({2}), has banned player {3}[{4}]({5}) IP: {6}, for {7}, for {8} seconds, IP Ban: {9}.", data.adminCharName, data.adminSteamName, data.adminSID.ToString(), data.targetCharName, data.targetSteamName, data.targetSID.ToString(), Parser.getIPFromUInt32(data.uIP), data.reason, data.duration.ToString(), data.isIPBan.ToString()));
             }
             else
             {

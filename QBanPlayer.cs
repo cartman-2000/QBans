@@ -46,7 +46,7 @@ namespace QBan
                             {
                                 SteamBlacklist.ban(bData.targetSID, bData.adminSID, bData.reason, timeLeft);
                                 SteamBlacklist.save();
-                                Logger.Log(String.Format("Player {0}[{1}]({2}), has been synced to internal bans, From IP Ban: {3}.", bData.targetCharName, bData.targetSteamName, bData.targetSID.ToString(), ipB.ToString()));
+                                Logger.Log(String.Format("Player {0}[{1}]({2}) IP: {3}, has been synced to internal bans, From IP Ban: {4}.", bData.targetCharName, bData.targetSteamName, bData.targetSID.ToString(), Parser.getIPFromUInt32(bData.uIP), ipB.ToString()));
                             }
                             else
                             {
