@@ -128,16 +128,30 @@ namespace QBan
                     BanDataValues temp = checkBan;
                     checkBan = new BanDataValues();
                     checkBan.targetSID = player.CSteamID;
-                    checkBan.targetCharName = player.CharacterName;
-                    checkBan.targetSteamName = player.SteamName;
+                    checkBan.targetCharName = player.CharacterName.Sanitze();
+                    checkBan.targetSteamName = player.SteamName.Sanitze();
                     checkBan.adminSID = temp.adminSID;
                     checkBan.adminCharName = temp.adminCharName;
                     checkBan.adminSteamName = temp.adminSteamName;
                     checkBan.reason = temp.reason;
-                    checkBan.duration = temp.duration;
                     checkBan.isIPBan = false;
                     checkBan.uIP = temp.uIP;
-                    checkBan.setTime = temp.setTime;
+
+                    // Either use the preset time that was in the matching ban, or adjust the time and duration to be at the current time, with the same expiration time. Will also determine whether or not the auto ip bans will appear in the bans list with the ip banned entry, or at the end of the list.
+                    if (Instance.Configuration.Instance.IPBanAutoAddUsePresetTime)
+                    {
+                        checkBan.setTime = temp.setTime;
+                        checkBan.duration = temp.duration;
+                    }
+                    else
+                    {
+                        checkBan.setTime = DateTime.Now;
+                        int duration = (int)(temp.duration - (checkBan.setTime - temp.setTime).TotalSeconds);
+                        if (duration > 0)
+                            checkBan.duration = (uint)duration;
+                        else
+                            checkBan.duration = 1;
+                    }
                     if (Instance.Configuration.Instance.IPBanAutoAdd)
                         dataStore.SetQBanData(player.CSteamID, checkBan);
                 }

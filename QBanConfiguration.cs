@@ -11,6 +11,7 @@ namespace QBan
         public bool ReasonManditory = true;
         public uint KickGracePeriod = 4;
         public bool IPBanAutoAdd = false;
+        public bool IPBanAutoAddUsePresetTime = true;
         [XmlArray("Bans"), XmlArrayItem(ElementName = "Ban")]
         public List<BanDataValues> Bans = new List<BanDataValues>();
         [XmlArray("ExpiredBans"), XmlArrayItem(ElementName = "ExpiredBan")]

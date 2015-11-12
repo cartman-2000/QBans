@@ -194,7 +194,7 @@ namespace QBan
             }
         }
 
-        // Seperated the duplicate lines of code for the messages and the ban saving/syncing.
+        // Separated the duplicate lines of code for the messages and the ban saving/syncing.
         private static void SetBan(IRocketPlayer caller, BanDataValues data)
         {
             if (QBan.Instance.dataStore.SetQBanData(data.targetSID, data))

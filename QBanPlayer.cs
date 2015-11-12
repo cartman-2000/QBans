@@ -38,13 +38,13 @@ namespace QBan
                         ping = 1;
                     if ((DateTime.Now - startTime).TotalSeconds >= QBan.Instance.Configuration.Instance.KickGracePeriod + (pData.Ping * 10))
                     {
-                        uint timeLeft = (uint)(bData.duration - (DateTime.Now - bData.setTime).TotalSeconds);
+                        int timeLeft = (int)(bData.duration - (DateTime.Now - bData.setTime).TotalSeconds);
                         // Don't sync/kick if the time left is negative.
                         if (timeLeft > 0)
                         {
                             if ((QBan.Instance.Configuration.Instance.EnableInternalSync && !ipB) || (QBan.Instance.Configuration.Instance.EnableInternalSync && QBan.Instance.Configuration.Instance.IPBanAutoAdd && ipB))
                             {
-                                SteamBlacklist.ban(bData.targetSID, bData.adminSID, bData.reason, timeLeft);
+                                SteamBlacklist.ban(bData.targetSID, bData.adminSID, bData.reason, (uint)timeLeft);
                                 SteamBlacklist.save();
                                 Logger.Log(String.Format("Player {0}[{1}]({2}) IP: {3}, has been synced to internal bans, From IP Ban: {4}.", bData.targetCharName, bData.targetSteamName, bData.targetSID.ToString(), Parser.getIPFromUInt32(bData.uIP), ipB.ToString()));
                             }
