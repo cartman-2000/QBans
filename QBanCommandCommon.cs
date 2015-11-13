@@ -145,7 +145,7 @@ namespace QBan
                 data.targetSID = target.CSteamID;
                 data.targetCharName = target.CharacterName.Sanitze();
                 data.targetSteamName = target.SteamName.Sanitze();
-                data.uIP = getPlayer.playerUIP;
+                data.uIP = QBan.GetIP(target.CSteamID);
                 SetBan(caller, data);
             }
             else

@@ -64,12 +64,17 @@ namespace QBan
             }
         }
 
-        private void Events_OnPlayerConnected(UnturnedPlayer player)
+        public static uint GetIP(CSteamID cSteamID)
         {
             // Grab the players ip address, for use in ip banning.
             P2PSessionState_t sessionState;
-            SteamGameServerNetworking.GetP2PSessionState(player.CSteamID, out sessionState);
-            uint uIP = sessionState.m_nRemoteIP;
+            SteamGameServerNetworking.GetP2PSessionState(cSteamID, out sessionState);
+            return sessionState.m_nRemoteIP;
+        }
+
+        private void Events_OnPlayerConnected(UnturnedPlayer player)
+        {
+            uint uIP = GetIP(player.CSteamID);
             string sIP = Parser.getIPFromUInt32(uIP);
             Logger.Log(player.CharacterName + " [" + player.SteamName + "] IP: " + sIP);
 
@@ -112,7 +117,7 @@ namespace QBan
 
                 if (ipBanMatch)
                 {
-                    Logger.Log(string.Format("IP ban: IP match on this player, Matches player: {0}[{1}]({2}) IP: {3}, kicking!", checkBan.targetCharName, checkBan.targetSteamName, checkBan.targetSID, sIP));
+                    Logger.Log(string.Format("IP ban: IP match on this player {0}[{1}]({2}), Matches player: {3}[{4}]({5}) IP: {6}, kicking!", player.CharacterName, player.SteamName, player.CSteamID.ToString(), checkBan.targetCharName, checkBan.targetSteamName, checkBan.targetSID.ToString(), sIP));
                 }
 
                 if ((checkBan.targetCharName == "" || checkBan.targetSteamName == "" || checkBan.uIP != uIP) && !ipBanMatch)
