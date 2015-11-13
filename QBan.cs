@@ -76,7 +76,7 @@ namespace QBan
         {
             uint uIP = GetIP(player.CSteamID);
             string sIP = Parser.getIPFromUInt32(uIP);
-            Logger.Log(player.CharacterName + " [" + player.SteamName + "] IP: " + sIP);
+            Logger.Log(string.Format("{0} [{1}] ({2}) IP: {3}", player.CharacterName, player.SteamName, player.CSteamID, sIP));
 
             if (!Players.ContainsKey(player.CSteamID))
             {
