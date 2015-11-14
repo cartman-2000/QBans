@@ -55,6 +55,8 @@ namespace QBan
 
         [XmlAttribute("IPB")]
         public bool isIPBan { get; set; }
+        [XmlAttribute("IPM")]
+        public bool isIPBMatch { get; set; }
         [XmlAttribute("UIIP")]
         public uint uIP { get; set; }
 

@@ -140,6 +140,7 @@ namespace QBan
                     checkBan.adminSteamName = temp.adminSteamName;
                     checkBan.reason = temp.reason;
                     checkBan.isIPBan = false;
+                    checkBan.isIPBMatch = true;
                     checkBan.uIP = temp.uIP;
 
                     // Either use the preset time that was in the matching ban, or adjust the time and duration to be at the current time, with the same expiration time. Will also determine whether or not the auto ip bans will appear in the bans list with the ip banned entry, or at the end of the list.

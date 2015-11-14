@@ -132,6 +132,7 @@ namespace QBan
             data.reason = banReason;
             data.duration = (uint)banDuration;
             data.isIPBan = false;
+            data.isIPBMatch = false;
             if (banType == BanType.IPBAN)
                 data.isIPBan = true;
             data.uIP = 0;

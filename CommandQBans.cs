@@ -125,12 +125,12 @@ namespace QBan
                     if (caller is ConsolePlayer)
                     {
                         Logger.Log(String.Format("{0}. {1} [{2}] ({3}), by {4} [{5}]", lineNumbers, (value.targetCharName.Length == 0 ? "Not set" : value.targetCharName), (value.targetSteamName.Length == 0 ? "Not set" : value.targetSteamName), value.targetSID.ToString(), value.adminCharName, value.adminSteamName));
-                        Logger.Log(String.Format("{0:M/d/yy HH:mm}|{1:M/d/yy}|{2}, {3}|{4}, Reason: {5}", value.setTime, value.setTime.AddSeconds(value.duration), timeLeftFormat, value.isIPBan.ToString(), (value.uIP == 0 ? "Not set" : Parser.getIPFromUInt32(value.uIP)), value.reason));
+                        Logger.Log(String.Format("{0:M/d/yy HH:mm}|{1:M/d/yy}|{2}, {3}|{4}|{5}, Reason: {6}", value.setTime, value.setTime.AddSeconds(value.duration), timeLeftFormat, value.isIPBan.ToString(), value.isIPBMatch.ToString(), (value.uIP == 0 ? "Not set" : Parser.getIPFromUInt32(value.uIP)), value.reason));
                     }
                     else
                     {
                         UnturnedChat.Say(caller, String.Format("{0}. {1} [{2}] ({3}), by {4} [{5}]", lineNumbers, (value.targetCharName.Length == 0 ? "Not set" : value.targetCharName.Truncate(14)), (value.targetSteamName.Length == 0 ? "Not set" : value.targetSteamName.Truncate(14)), value.targetSID.ToString(), value.adminCharName.Truncate(12), value.adminSteamName.Truncate(12)));
-                        UnturnedChat.Say(caller, String.Format("{0:M/d/yy HH:mm}|{1:M/d/yy}|{2}, {3}|{4}, Reason: {5}", value.setTime, value.setTime.AddSeconds(value.duration), timeLeftFormat, value.isIPBan.ToString(), (value.uIP == 0 ? "Not set" : Parser.getIPFromUInt32(value.uIP)), value.reason));
+                        UnturnedChat.Say(caller, String.Format("{0:M/d/yy HH:mm}|{1:M/d/yy}|{2}, {3}|{4}|{5}, Reason: {6}", value.setTime, value.setTime.AddSeconds(value.duration), timeLeftFormat, value.isIPBan.ToString(), value.isIPBMatch.ToString(), (value.uIP == 0 ? "Not set" : Parser.getIPFromUInt32(value.uIP)), value.reason));
                     }
                     lineNumbers++;
                 }
