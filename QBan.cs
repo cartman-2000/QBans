@@ -112,7 +112,7 @@ namespace QBan
             if (checkBan != null)
             {
                 // Don't try to ban if it has expired, or if they have the iban.overide permission.
-                if ((checkBan.duration - (DateTime.Now - checkBan.setTime).TotalSeconds <= 0) || (ipBanMatch && player.HasPermission("iban.overide")))
+                if ((checkBan.duration - (DateTime.Now - checkBan.setTime).TotalSeconds <= 0) || (ipBanMatch && player.HasPermission("ibanoveride")))
                     return;
 
                 if (ipBanMatch)
