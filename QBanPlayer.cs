@@ -12,6 +12,7 @@ namespace QBan
         private UnturnedPlayer pData;
         private BanDataValues bData;
         private bool ipB;
+        private float ping;
 
         protected override void Load()
         {
@@ -33,10 +34,10 @@ namespace QBan
             {
                 try
                 {
-                    float ping = pData.Ping;
+                    ping = pData.Ping;
                     if (ping == 0)
                         ping = 1;
-                    if ((DateTime.Now - startTime).TotalSeconds >= QBan.Instance.Configuration.Instance.KickGracePeriod + (pData.Ping * 10))
+                    if ((DateTime.Now - startTime).TotalSeconds >= QBan.Instance.Configuration.Instance.KickGracePeriod + (ping * 10))
                     {
                         int timeLeft = (int)(bData.duration - (DateTime.Now - bData.setTime).TotalSeconds);
                         // Don't sync/kick if the time left is negative.
