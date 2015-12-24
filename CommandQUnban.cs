@@ -11,9 +11,9 @@ namespace QBan
 {
     class CommandQUnban : IRocketCommand
     {
-        public bool AllowFromConsole
+        public AllowedCaller AllowedCaller
         {
-            get { return true; }
+            get { return AllowedCaller.Both; }
         }
 
         public string Name
