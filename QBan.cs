@@ -105,7 +105,9 @@ namespace QBan
             bool ipBanMatch = false;
             if (checkBan == null)
             {
-                checkBan = dataStore.GetIPQBanData(uIP);
+                // Don't query an ip ban if the players IP isn't set.
+                if (uIP != 0)
+                    checkBan = dataStore.GetIPQBanData(uIP);
                 if(checkBan != null)
                     ipBanMatch = true;
             }
