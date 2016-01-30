@@ -40,7 +40,7 @@ namespace QBan
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say(caller, this.Syntax + " - " + this.Help);
+                QBan.RconPrint(caller, this.Syntax + " - " + this.Help);
                 return;
             }
             QBanCommandCommon.Ban(caller, command, BanType.BAN);

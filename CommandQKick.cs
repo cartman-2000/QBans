@@ -44,21 +44,21 @@ namespace QBan
         {
             if(command.Length == 0)
             {
-                UnturnedChat.Say(caller, this.Syntax + " - " + this.Help);
+                QBan.RconPrint(caller, this.Syntax + " - " + this.Help);
                 return;
             }
 
             UnturnedPlayer target = command.GetUnturnedPlayerParameter(0);
             if(command.Length > 2)
             {
-                UnturnedChat.Say(caller, "Error: Too many arguments in command.");
+                QBan.RconPrint(caller, "Error: Too many arguments in command.");
                 return;
             }
 
             // Fail on invalid steam id or missing playername.
             if (command[0].Trim() == String.Empty || command[0].Trim() == "0")
             {
-                UnturnedChat.Say(caller, "Error: Invalid player name in kick command.");
+                QBan.RconPrint(caller, "Error: Invalid player name in kick command.");
                 return;
             }
 
@@ -66,7 +66,7 @@ namespace QBan
             // Fail if there is no reason when it has been set as mandetory.
             if (commandReason.Trim() == String.Empty && QBan.Instance.Configuration.Instance.ReasonManditory)
             {
-                UnturnedChat.Say(caller, "Error: Reason is manditory on kick command.");
+                QBan.RconPrint(caller, "Error: Reason is mandatory on kick command.");
                 return;
             }
 
@@ -83,7 +83,7 @@ namespace QBan
                 {
                     if (caller != target)
                     {
-                        UnturnedChat.Say(caller, String.Format("You've kicked player {0}[{1}]({2}).", target.CharacterName, target.SteamName, target.CSteamID));
+                        QBan.RconPrint(caller, String.Format("You've kicked player {0}[{1}]({2}).", target.CharacterName, target.SteamName, target.CSteamID));
                     }
                     UnturnedPlayer unturnedCaller = (UnturnedPlayer)caller;
                     Logger.Log(String.Format("Player {0}[{1}]({2}) has been kicked by admin {3}[{4}]({5}). Reason: {6}", target.CharacterName, target.SteamName, target.CSteamID, unturnedCaller.CharacterName, unturnedCaller.SteamName, unturnedCaller.CSteamID, reason));
@@ -95,7 +95,7 @@ namespace QBan
             }
             catch
             {
-                UnturnedChat.Say(caller, String.Format("Player {0} not found.", command[0]));
+                QBan.RconPrint(caller, String.Format("Player {0} not found.", command[0]));
             }
         }
     }

@@ -45,20 +45,20 @@ namespace QBan
         {
             if (command.Length == 0)
             {
-                UnturnedChat.Say(caller, this.Syntax + " - " + this.Help);
+                QBan.RconPrint(caller, this.Syntax + " - " + this.Help);
                 return;
             }
 
             if (command.Length > 1)
             {
-                UnturnedChat.Say(caller, "Error: Too many arguments in command.");
+                QBan.RconPrint(caller, "Error: Too many arguments in command.");
                 return;
             }
 
             // Fail on invalid steam id or missing playername.
             if (command[0].Trim() == String.Empty || command[0].Trim() == "0")
             {
-                UnturnedChat.Say(caller, String.Format("Error: Could not find player by ID {0} to unban.", command[0]));
+                QBan.RconPrint(caller, String.Format("Error: Could not find player by ID {0} to unban.", command[0]));
                 return;
             }
 
@@ -80,13 +80,14 @@ namespace QBan
             }
 
             bool isCSteamID;
+            CSteamID cSteamID;
             BanDataValues banData;
-            try
+            if (command[0].isCSteamID(out cSteamID))
             {
-                banData = QBan.Instance.dataStore.GetQBanData(command[0].StringToCSteamID());
+                banData = QBan.Instance.dataStore.GetQBanData(cSteamID);
                 isCSteamID = true;
             }
-            catch
+            else
             {
                 banData = QBan.Instance.dataStore.GetQBanData(command[0]);
                 isCSteamID = false;
@@ -99,28 +100,28 @@ namespace QBan
             }
             else
             {
-                // Player hasen't been found, check to see if the ban exists in the internal bans, if CSteamID, otherwise fail.
+                // Player hasn't been found, check to see if the ban exists in the internal bans, if CSteamID, otherwise fail.
                 if (isCSteamID)
                 {
                     SteamBlacklistID Out;
-                    if (SteamBlacklist.checkBanned(command[0].StringToCSteamID(), out Out))
+                    if (SteamBlacklist.checkBanned(cSteamID, out Out))
                     {
                         banData = new BanDataValues();
-                        banData.targetSID = command[0].StringToCSteamID();
+                        banData.targetSID = cSteamID;
                         banData.targetCharName = "";
                         banData.targetSteamName = "";
                         RemoveBan(caller, callerCSteamID, callerCharName, callerSteamName, banData);
                     }
                     else
                     {
-                        UnturnedChat.Say(caller, String.Format("Error: Could not find player by ID {0} to unban.", command[0]));
+                        QBan.RconPrint(caller, String.Format("Error: Could not find player by ID {0} to unban.", command[0]));
                         return;
                     }
                 }
                 else
                 {
-                    // Player hasen't been found.
-                    UnturnedChat.Say(caller, String.Format("Error: Could not find player {0} to unban.", command[0]));
+                    // Player hasn't been found.
+                    QBan.RconPrint(caller, String.Format("Error: Could not find player {0} to unban.", command[0]));
                     return;
                 }
             }
@@ -133,7 +134,7 @@ namespace QBan
             SteamBlacklist.unban(banData.targetSID);
             SteamBlacklist.save();
 
-            UnturnedChat.Say(caller, String.Format("You have unbanned player {0}[{1}]({2}).", banData.targetCharName, banData.targetSteamName, banData.targetSID.ToString()));
+            QBan.RconPrint(caller, String.Format("You have unbanned player {0}[{1}]({2}).", banData.targetCharName, banData.targetSteamName, banData.targetSID.ToString()));
             Logger.Log(String.Format("Admin {0}[{1}]({2}), has unbanned player {3}[{4}]({5}).", callerCharName, callerSteamName, callerCSteamID, banData.targetCharName, banData.targetSteamName, banData.targetSID));
         }
     }

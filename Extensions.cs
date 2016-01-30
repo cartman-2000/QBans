@@ -12,19 +12,20 @@ namespace QBan
             return value.Length <= maxLength ? value : value.Substring(0, maxLength);
         }
 
-        // Returns a Steamworks.CSteamID from a string, throws a FormatException if the string isn't a valid unsigned number, or isn't in the valid range.
-        public static CSteamID StringToCSteamID(this string sCSteamID)
+        // Returns a Steamworks.CSteamID on out from a string, and returns true if it is a CSteamID.
+        public static bool isCSteamID(this string sCSteamID, out CSteamID cSteamID)
         {
             ulong ulCSteamID;
+            cSteamID = (CSteamID)0;
             if (ulong.TryParse(sCSteamID, out ulCSteamID))
             {
                 if ((ulCSteamID >= 0x0110000100000000 && ulCSteamID <= 0x0170000000000000) || ulCSteamID == 0)
                 {
-                    return (CSteamID)ulCSteamID;
+                    cSteamID = (CSteamID)ulCSteamID;
+                    return true;
                 }
-                throw new FormatException(String.Format("Unable to convert {0} to a CSteamID, not in the valid range.", sCSteamID));
             }
-            throw new FormatException(String.Format("Unable to convert {0} to a CSteamID, not a valid unsigned number.", sCSteamID));
+            return false;
         }
 
         // Sanitize strings with binary control characters 0x00-0x1f.
