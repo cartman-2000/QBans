@@ -122,7 +122,7 @@ namespace QBan
                     }
 
                     // build the strings for the ban info.
-                    QBan.RconPrint(caller, String.Format("{0}. {1} [{2}] ({3}), by {4} [{5}]", lineNumbers, (value.targetCharName.Length == 0 ? "Not set" : caller is ConsolePlayer ? value.targetCharName : value.targetCharName.Truncate(14)), (value.targetSteamName.Length == 0 ? "Not set" : caller is ConsolePlayer ? value.targetCharName : value.targetSteamName.Truncate(14)), value.targetSID.ToString(), caller is ConsolePlayer ? value.adminCharName : value.adminCharName.Truncate(12), caller is ConsolePlayer ? value.adminSteamName : value.adminSteamName.Truncate(12)));
+                    QBan.RconPrint(caller, String.Format("{0}. {1} [{2}] ({3}), by {4} [{5}]", lineNumbers, (value.targetCharName.Length == 0 ? "Not set" : caller is ConsolePlayer ? value.targetCharName : value.targetCharName.Truncate(14)), (value.targetSteamName.Length == 0 ? "Not set" : caller is ConsolePlayer ? value.targetSteamName : value.targetSteamName.Truncate(14)), value.targetSID.ToString(), caller is ConsolePlayer ? value.adminCharName : value.adminCharName.Truncate(12), caller is ConsolePlayer ? value.adminSteamName : value.adminSteamName.Truncate(12)));
                     QBan.RconPrint(caller, String.Format("{0:M/d/yy HH:mm}|{1:M/d/yy}|{2}, {3}|{4}|{5}, Reason: {6}", value.setTime, value.setTime.AddSeconds(value.duration), timeLeftFormat, value.isIPBan.ToString(), value.isIPBMatch.ToString(), (value.uIP == 0 ? "Not set" : Parser.getIPFromUInt32(value.uIP)), value.reason));
                     lineNumbers++;
                 }
