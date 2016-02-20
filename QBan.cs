@@ -10,9 +10,6 @@ using Steamworks;
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using Rocket.Core.RCON;
-using Rocket.Unturned.Chat;
-using Rocket.Core;
 
 namespace QBan
 {
@@ -73,13 +70,6 @@ namespace QBan
             P2PSessionState_t sessionState;
             SteamGameServerNetworking.GetP2PSessionState(cSteamID, out sessionState);
             return sessionState.m_nRemoteIP;
-        }
-
-        internal static void RconPrint(IRocketPlayer caller, string msg)
-        {
-            if (caller is ConsolePlayer && R.Settings.Instance.RCON.Enabled && Instance.Configuration.Instance.PrintToRCON)
-                RCONServer.Broadcast(msg);
-            UnturnedChat.Say(caller, msg);
         }
 
         private void Events_OnPlayerConnected(UnturnedPlayer player)

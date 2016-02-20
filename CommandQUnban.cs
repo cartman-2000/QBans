@@ -45,20 +45,20 @@ namespace QBan
         {
             if (command.Length == 0)
             {
-                QBan.RconPrint(caller, this.Syntax + " - " + this.Help);
+                UnturnedChat.Say(caller, this.Syntax + " - " + this.Help);
                 return;
             }
 
             if (command.Length > 1)
             {
-                QBan.RconPrint(caller, "Error: Too many arguments in command.");
+                UnturnedChat.Say(caller, "Error: Too many arguments in command.");
                 return;
             }
 
             // Fail on invalid steam id or missing playername.
             if (command[0].Trim() == String.Empty || command[0].Trim() == "0")
             {
-                QBan.RconPrint(caller, String.Format("Error: Could not find player by ID {0} to unban.", command[0]));
+                UnturnedChat.Say(caller, String.Format("Error: Could not find player by ID {0} to unban.", command[0]));
                 return;
             }
 
@@ -114,14 +114,14 @@ namespace QBan
                     }
                     else
                     {
-                        QBan.RconPrint(caller, String.Format("Error: Could not find player by ID {0} to unban.", command[0]));
+                        UnturnedChat.Say(caller, String.Format("Error: Could not find player by ID {0} to unban.", command[0]));
                         return;
                     }
                 }
                 else
                 {
                     // Player hasn't been found.
-                    QBan.RconPrint(caller, String.Format("Error: Could not find player {0} to unban.", command[0]));
+                    UnturnedChat.Say(caller, String.Format("Error: Could not find player {0} to unban.", command[0]));
                     return;
                 }
             }
@@ -134,7 +134,7 @@ namespace QBan
             SteamBlacklist.unban(banData.targetSID);
             SteamBlacklist.save();
 
-            QBan.RconPrint(caller, String.Format("You have unbanned player {0}[{1}]({2}).", banData.targetCharName, banData.targetSteamName, banData.targetSID.ToString()));
+            UnturnedChat.Say(caller, String.Format("You have unbanned player {0}[{1}]({2}).", banData.targetCharName, banData.targetSteamName, banData.targetSID.ToString()));
             Logger.Log(String.Format("Admin {0}[{1}]({2}), has unbanned player {3}[{4}]({5}).", callerCharName, callerSteamName, callerCSteamID, banData.targetCharName, banData.targetSteamName, banData.targetSID));
         }
     }

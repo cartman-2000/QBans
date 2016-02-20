@@ -44,7 +44,7 @@ namespace QBan
         {
             if (command.Length > 2)
             {
-                QBan.RconPrint(caller, "Error: Too many areguments in command.");
+                UnturnedChat.Say(caller, "Error: Too many areguments in command.");
                 return;
             }
 
@@ -54,7 +54,7 @@ namespace QBan
             {
                 if (command[0].Trim() == "help")
                 {
-                    QBan.RconPrint(caller, this.Syntax + " - " + this.Help);
+                    UnturnedChat.Say(caller, this.Syntax + " - " + this.Help);
                     return;
                 }
             }
@@ -75,20 +75,20 @@ namespace QBan
                 pagination = (int)command.GetInt32Parameter(0);
                 if (pagination < 1)
                 {
-                    QBan.RconPrint(caller, "Error: Page number is zero, or negative.");
+                    UnturnedChat.Say(caller, "Error: Page number is zero, or negative.");
                     return;
                 }
             }
             else if (command.Length > 0)
             {
-                QBan.RconPrint(caller, "Error: Page number is not a number.");
+                UnturnedChat.Say(caller, "Error: Page number is not a number.");
                 return;
             }
 
             KeyValuePair<int, List<BanDataValues>> list = QBan.Instance.dataStore.GetQBanDataList(target, recordcount, pagination);
             if (list.Value.Count == 0)
             {
-                QBan.RconPrint(caller, string.Format("Error: Can't find any players by the name of: {0}", target));
+                UnturnedChat.Say(caller, string.Format("Error: Can't find any players by the name of: {0}", target));
                 return;
             }
             else
@@ -122,8 +122,8 @@ namespace QBan
                     }
 
                     // build the strings for the ban info.
-                    QBan.RconPrint(caller, String.Format("{0}. {1} [{2}] ({3}), by {4} [{5}]", lineNumbers, (value.targetCharName.Length == 0 ? "Not set" : caller is ConsolePlayer ? value.targetCharName : value.targetCharName.Truncate(14)), (value.targetSteamName.Length == 0 ? "Not set" : caller is ConsolePlayer ? value.targetSteamName : value.targetSteamName.Truncate(14)), value.targetSID.ToString(), caller is ConsolePlayer ? value.adminCharName : value.adminCharName.Truncate(12), caller is ConsolePlayer ? value.adminSteamName : value.adminSteamName.Truncate(12)));
-                    QBan.RconPrint(caller, String.Format("{0:M/d/yy HH:mm}|{1:M/d/yy}|{2}, {3}|{4}|{5}, Reason: {6}", value.setTime, value.setTime.AddSeconds(value.duration), timeLeftFormat, value.isIPBan.ToString(), value.isIPBMatch.ToString(), (value.uIP == 0 ? "Not set" : Parser.getIPFromUInt32(value.uIP)), value.reason));
+                    UnturnedChat.Say(caller, String.Format("{0}. {1} [{2}] ({3}), by {4} [{5}]", lineNumbers, (value.targetCharName.Length == 0 ? "Not set" : caller is ConsolePlayer ? value.targetCharName : value.targetCharName.Truncate(14)), (value.targetSteamName.Length == 0 ? "Not set" : caller is ConsolePlayer ? value.targetSteamName : value.targetSteamName.Truncate(14)), value.targetSID.ToString(), caller is ConsolePlayer ? value.adminCharName : value.adminCharName.Truncate(12), caller is ConsolePlayer ? value.adminSteamName : value.adminSteamName.Truncate(12)));
+                    UnturnedChat.Say(caller, String.Format("{0:M/d/yy HH:mm}|{1:M/d/yy}|{2}, {3}|{4}|{5}, Reason: {6}", value.setTime, value.setTime.AddSeconds(value.duration), timeLeftFormat, value.isIPBan.ToString(), value.isIPBMatch.ToString(), (value.uIP == 0 ? "Not set" : Parser.getIPFromUInt32(value.uIP)), value.reason));
                     lineNumbers++;
                 }
             }

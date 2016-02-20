@@ -27,7 +27,7 @@ namespace QBan
 
             if (command.Length > 4)
             {
-                QBan.RconPrint(caller, "Too many arguments in command.");
+                UnturnedChat.Say(caller, "Too many arguments in command.");
                 return;
             }
 
@@ -36,12 +36,12 @@ namespace QBan
             {
                 if (playerName == String.Empty || playerName == "0")
                 {
-                    QBan.RconPrint(caller, "Error: Invalid player name in ban command.");
+                    UnturnedChat.Say(caller, "Error: Invalid player name in ban command.");
                     return;
                 }
                 if ((command.GetStringParameter(1) != null ? command.GetStringParameter(1) : "").Sanitze().Trim() == String.Empty && QBan.Instance.Configuration.Instance.ReasonManditory)
                 {
-                    QBan.RconPrint(caller, "Error: Reason is mandatory on ban command.");
+                    UnturnedChat.Say(caller, "Error: Reason is mandatory on ban command.");
                     return;
                 }
                 else if (command.Length >= 2)
@@ -55,12 +55,12 @@ namespace QBan
             {
                 if (!long.TryParse(command[2], out banDuration))
                 {
-                    QBan.RconPrint(caller, "Error: Invalid number entered for duration.");
+                    UnturnedChat.Say(caller, "Error: Invalid number entered for duration.");
                     return;
                 }
                 else if (banDuration < 0)
                 {
-                    QBan.RconPrint(caller, "Error: Duration is a negative number.");
+                    UnturnedChat.Say(caller, "Error: Duration is a negative number.");
                     return;
                 }
                 else if (banDuration == 0 || banDuration >= maxDuration)
@@ -84,7 +84,7 @@ namespace QBan
                         banDuration = banDuration * 60;
                         break;
                     default:
-                        QBan.RconPrint(caller, "Error: Improper time modifier entered into command.");
+                        UnturnedChat.Say(caller, "Error: Improper time modifier entered into command.");
                         return;
                 }
                 if (banDuration > maxDuration)
@@ -168,7 +168,7 @@ namespace QBan
                     // Can't ban a player if the SteamID64 number can't be found. Explicitly add the ban if what was entered was a SteamID64 number.
                     if (!isCSteamID)
                     {
-                        QBan.RconPrint(caller, String.Format("Error: Can't find a player by the name of {0}, that has played on the server before.", playerName));
+                        UnturnedChat.Say(caller, String.Format("Error: Can't find a player by the name of {0}, that has played on the server before.", playerName));
                         return;
                     }
                     else
@@ -182,13 +182,13 @@ namespace QBan
                             SteamBlacklist.unban(data.targetSID);
                             SteamBlacklist.save();
 
-                            QBan.RconPrint(caller, String.Format("Player SteamID64:{0}, has been banned for {1} seconds, IP Ban: {2}.", data.targetSID.ToString(), data.duration.ToString(),data.isIPBan.ToString()));
-                            QBan.RconPrint(caller, String.Format("Reason: {0}", data.reason));
+                            UnturnedChat.Say(caller, String.Format("Player SteamID64:{0}, has been banned for {1} seconds, IP Ban: {2}.", data.targetSID.ToString(), data.duration.ToString(),data.isIPBan.ToString()));
+                            UnturnedChat.Say(caller, String.Format("Reason: {0}", data.reason));
                             Logger.Log(String.Format("Admin {0}[{1}]({2}), has banned SteamID64:{3} for {4}, for {5} seconds, IP Ban: {6}.", callerCharName, callerSteamName, callerCSteamID.ToString(), data.targetSID.ToString(), data.reason, data.duration.ToString(), data.isIPBan.ToString()));
                         }
                         else
                         {
-                            QBan.RconPrint(caller, "Error: Was unable to set the ban record for the player.");
+                            UnturnedChat.Say(caller, "Error: Was unable to set the ban record for the player.");
                             return;
                         }
                     }
@@ -211,13 +211,13 @@ namespace QBan
                     Provider.kick(data.targetSID, string.Format("Banned for: {0}, Time left: {1}", data.reason, data.duration));
                 }
 
-                QBan.RconPrint(caller, String.Format("Player {0}[{1}], has been banned for {2} seconds, IP Ban: {3}.", data.targetCharName.Truncate(12), data.targetSteamName.Truncate(12), data.duration.ToString(), data.isIPBan.ToString()));
-                QBan.RconPrint(caller, String.Format("Reason: {0}", data.reason));
+                UnturnedChat.Say(caller, String.Format("Player {0}[{1}], has been banned for {2} seconds, IP Ban: {3}.", data.targetCharName.Truncate(12), data.targetSteamName.Truncate(12), data.duration.ToString(), data.isIPBan.ToString()));
+                UnturnedChat.Say(caller, String.Format("Reason: {0}", data.reason));
                 Logger.Log(String.Format("Admin {0}[{1}]({2}), has banned player {3}[{4}]({5}) IP: {6}, for {7}, for {8} seconds, IP Ban: {9}.", data.adminCharName, data.adminSteamName, data.adminSID.ToString(), data.targetCharName, data.targetSteamName, data.targetSID.ToString(), Parser.getIPFromUInt32(data.uIP), data.reason, data.duration.ToString(), data.isIPBan.ToString()));
             }
             else
             {
-                QBan.RconPrint(caller, "Error: Was unable to set the ban record for the player.");
+                UnturnedChat.Say(caller, "Error: Was unable to set the ban record for the player.");
             }
         }
     }
