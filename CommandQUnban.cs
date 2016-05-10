@@ -84,12 +84,12 @@ namespace QBan
             BanDataValues banData;
             if (command[0].isCSteamID(out cSteamID))
             {
-                banData = QBan.Instance.dataStore.GetQBanData(cSteamID);
+                banData = QBan.DataStore.GetQBanData(cSteamID);
                 isCSteamID = true;
             }
             else
             {
-                banData = QBan.Instance.dataStore.GetQBanData(command[0]);
+                banData = QBan.DataStore.GetQBanData(command[0]);
                 isCSteamID = false;
             }
 
@@ -130,7 +130,7 @@ namespace QBan
         // Put the duplicate messages and ban data handling lines in a separate function.
         private static void RemoveBan(IRocketPlayer caller, CSteamID callerCSteamID, string callerCharName, string callerSteamName, BanDataValues banData)
         {
-            QBan.Instance.dataStore.RemoveQBanData(banData.targetSID);
+            QBan.DataStore.RemoveQBanData(banData.targetSID);
             SteamBlacklist.unban(banData.targetSID);
             SteamBlacklist.save();
 

@@ -8,17 +8,17 @@ using Rocket.Core.Logging;
 
 namespace QBan
 {
-    public class DataStore
+    public class DataManager
     {
-        private static Dictionary<CSteamID, BanDataValues> QBanData = new Dictionary<CSteamID, BanDataValues>();
+        private Dictionary<CSteamID, BanDataValues> QBanData = new Dictionary<CSteamID, BanDataValues>();
 
-        public DataStore()
+        public DataManager()
         {
             Initialize();
         }
 
         // Initialize/load the ban data here.
-        private static void Initialize()
+        private void Initialize()
         {
             DateTime unsetDateTime = new DateTime(0);
             foreach (BanDataValues banData in QBan.Instance.Configuration.Instance.Bans)
@@ -54,11 +54,6 @@ namespace QBan
                     Logger.LogWarning("Error: Duplicate record in the config file.");
                 }
             }
-        }
-
-        public void Unload()
-        {
-            QBanData.Clear();
         }
 
         // Set ban data and save out to file.
@@ -127,7 +122,7 @@ namespace QBan
             int index;
             int numbeOfRecords;
 
-            // Do the math for the pagenation so that no negative numbers are entered into matches.GetRange.
+            // Do the math for the pagination so that no negative numbers are entered into matches.GetRange.
             if (matchCount - (count * pagination) <= 0)
             {
                 index = 0;
@@ -140,7 +135,7 @@ namespace QBan
                 index = matchCount - count * pagination;
                 numbeOfRecords = count;
             }
-            // Return index posistion and the list.
+            // Return index position and the list.
             return new KeyValuePair<int, List<BanDataValues>>(index + 1, new List<BanDataValues>(matches.GetRange(index, numbeOfRecords)));
         }
 
@@ -164,7 +159,7 @@ namespace QBan
         }
 
         // Save to file.
-        private static void SaveToFile()
+        private void SaveToFile()
         {
             // Dump the data in the QBanData dictionary to the configuration and save.
             QBan.Instance.Configuration.Instance.Bans = QBanData.Values.ToList();

@@ -176,7 +176,7 @@ namespace QBan
                         data.targetSID = cSteamID;
                         data.targetCharName = "";
                         data.targetSteamName = "";
-                        if (QBan.Instance.dataStore.SetQBanData(data.targetSID, data))
+                        if (QBan.DataStore.SetQBanData(data.targetSID, data))
                         {
                             //Unsync a previous set ban so the player info can be set when they next connect to the server.
                             SteamBlacklist.unban(data.targetSID);
@@ -199,7 +199,7 @@ namespace QBan
         // Separated the duplicate lines of code for the messages and the ban saving/syncing.
         private static void SetBan(IRocketPlayer caller, BanDataValues data)
         {
-            if (QBan.Instance.dataStore.SetQBanData(data.targetSID, data))
+            if (QBan.DataStore.SetQBanData(data.targetSID, data))
             {
                 if (QBan.Instance.Configuration.Instance.EnableInternalSync)
                 {

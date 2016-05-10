@@ -76,7 +76,7 @@
     <Compile Include="BanDataValues.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="CommandQKick.cs" />
-    <Compile Include="DataStore.cs" />
+    <Compile Include="DataManager.cs" />
     <Compile Include="CommandQBans.cs" />
     <Compile Include="CommandQBan.cs" />
     <Compile Include="CommandQUnban.cs" />

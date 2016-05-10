@@ -84,7 +84,7 @@ namespace QBan
                 return;
             }
 
-            KeyValuePair<int, List<BanDataValues>> list = QBan.Instance.dataStore.GetQBanDataList(target, recordcount, pagination);
+            KeyValuePair<int, List<BanDataValues>> list = QBan.DataStore.GetQBanDataList(target, recordcount, pagination);
             if (list.Value.Count == 0)
             {
                 UnturnedChat.Say(caller, string.Format("Error: Can't find any players by the name of: {0}", target));
