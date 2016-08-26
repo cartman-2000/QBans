@@ -203,7 +203,7 @@ namespace QBan
             {
                 if (QBan.Instance.Configuration.Instance.EnableInternalSync)
                 {
-                    SteamBlacklist.ban(data.targetSID, data.adminSID, data.reason, data.duration);
+                    SteamBlacklist.ban(data.targetSID, 0, data.adminSID, data.reason, data.duration);
                     SteamBlacklist.save();
                 }
                 else

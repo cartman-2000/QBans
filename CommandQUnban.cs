@@ -104,7 +104,7 @@ namespace QBan
                 if (isCSteamID)
                 {
                     SteamBlacklistID Out;
-                    if (SteamBlacklist.checkBanned(cSteamID, out Out))
+                    if (SteamBlacklist.checkBanned(cSteamID, 0, out Out))
                     {
                         banData = new BanDataValues();
                         banData.targetSID = cSteamID;

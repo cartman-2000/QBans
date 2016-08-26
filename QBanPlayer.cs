@@ -147,7 +147,7 @@ namespace QBan
                         bData.reason += ipB ? " (IP ban match.)" : "";
                         if (QBan.Instance.Configuration.Instance.IPBanAutoAdd && ipB)
                             QBan.DataStore.SetQBanData(Player.CSteamID, bData);
-                        SteamBlacklist.ban(bData.targetSID, bData.adminSID, bData.reason, (uint)timeLeft);
+                        SteamBlacklist.ban(bData.targetSID, 0, bData.adminSID, bData.reason, (uint)timeLeft);
                         SteamBlacklist.save();
                         Logger.Log(String.Format("Player: {0} [{1}] ({2}), IP: {3}, has been synced to internal bans, From IP Ban: {4}.", bData.targetCharName, bData.targetSteamName, bData.targetSID.ToString(), Parser.getIPFromUInt32(bData.uIP), ipB.ToString()));
                     }
